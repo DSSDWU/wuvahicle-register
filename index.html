@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ขึ้นทะเบียนขอใช้รถ - ม.วลัยลักษณ์</title>
+  <title>ระบบขึ้นทะเบียนขอใช้รถ - ม.วลัยลักษณ์</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -34,6 +34,7 @@
 <body>
   <div class="container">
     <div class="header">
+      <img src="https://www.wu.ac.th/uploads/logoWU_1631668089.png" alt="โลโก้ ม.วลัยลักษณ์" style="height: 60px; margin-bottom: 10px;"><br>
       <h3>ระบบขึ้นทะเบียนขอใช้รถ - มหาวิทยาลัยวลัยลักษณ์</h3>
     </div>
 
@@ -75,7 +76,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">เบอร์โทรศัพท์</label>
-          <input type="tel" class="form-control" name="phone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0">
+          <input type="tel" class="form-control" name="phone" pattern="0[0-9]{9}" maxlength="10" required>
         </div>
         <div class="mb-3">
           <label class="form-label required">ที่พักปัจจุบัน</label>
@@ -97,6 +98,7 @@
         <div class="mb-3">
           <label class="form-label required">ความสัมพันธ์กับนักศึกษา</label>
           <select class="form-select" name="emergencyRelation" required>
+            <option value="">-- เลือก --</option>
             <option>บิดา/มารดา</option>
             <option>ผู้ปกครอง</option>
             <option>ญาติ</option>
@@ -105,15 +107,16 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
-          <input type="tel" class="form-control" name="emergencyPhone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0">
+          <input type="tel" class="form-control" name="emergencyPhone" pattern="0[0-9]{9}" maxlength="10" required>
         </div>
       </div>
 
       <div class="form-section">
-        <h5>ส่วนที่ 2: ข้อมูลรถ</h5>
+        <h5>ส่วนที่ 2: ข้อมูลรถที่ขึ้นทะเบียน</h5>
         <div class="mb-3">
           <label class="form-label required">ประเภทรถ</label>
           <select class="form-select" name="vehicleType" required>
+            <option value="">-- เลือก --</option>
             <option>รถยนต์(น้ำมัน)</option>
             <option>รถยนต์ไฟฟ้า</option>
             <option>รถจักรยานยนต์ไฟฟ้า</option>
@@ -131,6 +134,7 @@
         <div class="mb-3">
           <label class="form-label required">จังหวัด</label>
           <select class="form-select" name="licenseProvince" required>
+            <option value="">-- เลือก --</option>
             <option>ป้ายแดง</option>
             <option>ไม่สามารถจดทะเบียนได้</option>
             <option>กรุงเทพมหานคร</option>
@@ -147,92 +151,89 @@
             <option>ชุมพร</option>
             <option>เชียงราย</option>
             <option>เชียงใหม่</option>
-            <!-- สามารถเพิ่มจังหวัดอื่นๆ ได้อีกตามต้องการ -->
+            <option>ตรัง</option>
+            <option>ตราด</option>
+            <option>ตาก</option>
+            <option>นครนายก</option>
+            <option>นครปฐม</option>
+            <option>นครพนม</option>
+            <option>นครราชสีมา</option>
+            <option>นครศรีธรรมราช</option>
+            <option>นครสวรรค์</option>
+            <option>นนทบุรี</option>
+            <option>นราธิวาส</option>
+            <option>น่าน</option>
+            <option>บึงกาฬ</option>
+            <option>บุรีรัมย์</option>
+            <option>ปทุมธานี</option>
+            <option>ประจวบคีรีขันธ์</option>
+            <option>ปราจีนบุรี</option>
+            <option>ปัตตานี</option>
+            <option>พระนครศรีอยุธยา</option>
+            <option>พะเยา</option>
+            <option>พังงา</option>
+            <option>พัทลุง</option>
+            <option>พิจิตร</option>
+            <option>พิษณุโลก</option>
+            <option>เพชรบุรี</option>
+            <option>เพชรบูรณ์</option>
+            <option>แพร่</option>
+            <option>ภูเก็ต</option>
+            <option>มหาสารคาม</option>
+            <option>มุกดาหาร</option>
+            <option>แม่ฮ่องสอน</option>
+            <option>ยะลา</option>
+            <option>ยโสธร</option>
+            <option>ร้อยเอ็ด</option>
+            <option>ระนอง</option>
+            <option>ระยอง</option>
+            <option>ราชบุรี</option>
+            <option>ลพบุรี</option>
+            <option>ลำปาง</option>
+            <option>ลำพูน</option>
+            <option>เลย</option>
+            <option>ศรีสะเกษ</option>
+            <option>สกลนคร</option>
+            <option>สงขลา</option>
+            <option>สตูล</option>
+            <option>สมุทรปราการ</option>
+            <option>สมุทรสงคราม</option>
+            <option>สมุทรสาคร</option>
+            <option>สระแก้ว</option>
+            <option>สระบุรี</option>
+            <option>สิงห์บุรี</option>
+            <option>สุโขทัย</option>
+            <option>สุพรรณบุรี</option>
+            <option>สุราษฎร์ธานี</option>
+            <option>สุรินทร์</option>
+            <option>หนองคาย</option>
+            <option>หนองบัวลำภู</option>
+            <option>อ่างทอง</option>
+            <option>อำนาจเจริญ</option>
+            <option>อุดรธานี</option>
+            <option>อุตรดิตถ์</option>
+            <option>อุทัยธานี</option>
+            <option>อุบลราชธานี</option>
           </select>
         </div>
         <div class="mb-3">
           <label class="form-label">สีรถ</label>
           <input type="text" class="form-control" name="vehicleColor">
         </div>
-        <div class="mb-3"><label class="form-label required">ภาพรถด้านหน้า</label><input type="file" class="form-control" name="imageFront" accept="image/*" required></div>
-        <div class="mb-3"><label class="form-label required">ภาพรถด้านหลัง</label><input type="file" class="form-control" name="imageBack" accept="image/*" required></div>
-        <div class="mb-3"><label class="form-label required">ภาพรถด้านซ้าย</label><input type="file" class="form-control" name="imageLeft" accept="image/*" required></div>
-        <div class="mb-3"><label class="form-label required">ภาพรถด้านขวา</label><input type="file" class="form-control" name="imageRight" accept="image/*" required></div>
-        <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="confirmCheck" required>
-          <label class="form-check-label" for="confirmCheck">
-            ขอรับรองว่าข้อมูลถูกต้องและเป็นความจริงทุกประการ หากมีเจตนาให้ข้อมูลเท็จ ข้าพเจ้ายินดีรับโทษตามระเบียบและข้อบังคับของมหาวิทยาลัยทุกประการ
-          </label>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านหน้า</label>
+          <input type="file" class="form-control" name="imageFront" accept="image/*" required>
         </div>
-        <button type="button" class="btn btn-primary" onclick="submitForm()">ส่งข้อมูล</button>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านหลัง</label>
+          <input type="file" class="form-control" name="imageBack" accept="image/*" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านซ้าย</label>
+          <input type="file" class="form-control" name="imageLeft" accept="image/*" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านขวา</label>
+          <input type="file" class="form-control" name="imageRight" accept="image/*" required>
+        </div>
       </div>
-    </form>
-  </div>
-
-<script>
-async function uploadImage(file, studentId) {
-  const reader = new FileReader();
-  return new Promise((resolve, reject) => {
-    reader.onload = async () => {
-      const base64 = reader.result.split(',')[1];
-
-      const uploadBody = new FormData();
-      uploadBody.append("filedata", base64);
-      uploadBody.append("filename", file.name);
-      uploadBody.append("studentId", studentId);
-
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzFR04epoLxFzBecc-UIduoXIcTfjq0XY8LAnkgSptz8w4CjK-1ge31JLlR5MWSuZJS/exec", {
-        method: "POST",
-        body: uploadBody
-      });
-
-      const url = await response.text();
-      resolve(url);
-    };
-
-    reader.onerror = () => reject("อ่านไฟล์ไม่ได้");
-    reader.readAsDataURL(file);
-  });
-}
-
-async function submitForm() {
-  const confirmBox = document.getElementById('confirmCheck');
-  if (!confirmBox.checked) {
-    alert('กรุณายอมรับข้อตกลงก่อนส่งข้อมูล');
-    return;
-  }
-  const form = document.getElementById("registerForm");
-  const formData = new FormData(form);
-  const imageFields = ["imageFront", "imageBack", "imageLeft", "imageRight"];
-
-  const imageURLs = [];
-  for (let field of imageFields) {
-    const fileInput = document.querySelector(`input[name='${field}']`);
-    if (fileInput.files.length > 0) {
-      const studentId = form.querySelector("input[name='studentId']").value.trim();
-      const url = await uploadImage(fileInput.files[0], studentId);
-      imageURLs.push(url);
-    } else {
-      alert(`กรุณาแนบรูปภาพให้ครบ: ${field}`);
-      return;
-    }
-  }
-
-  formData.append("imageFrontURL", imageURLs[0]);
-  formData.append("imageBackURL", imageURLs[1]);
-  formData.append("imageLeftURL", imageURLs[2]);
-  formData.append("imageRightURL", imageURLs[3]);
-
-  const response = await fetch("https://script.google.com/macros/s/AKfycbz8wSBOi4--ZlvfKGxZUB_mjCDEJefBx41maq1aD2P1OUt8P0i_PAroLfLcYA9AYtg9ew/exec", {
-    method: "POST",
-    body: formData
-  });
-
-  const result = await response.text();
-  alert(result);
-  form.reset();
-}
-</script>
-
-</body>
-</html>
