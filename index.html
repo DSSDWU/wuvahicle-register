@@ -38,9 +38,56 @@
     </div>
 
     <form id="registerForm" enctype="multipart/form-data">
-      <!-- [ฟอร์มทั้งหมดเหมือนเดิม ยกเว้นลบ method/action ออก] -->
-      <!-- ... ฟอร์มยังคงเหมือนเดิม ... -->
-      <button type="button" class="btn btn-primary" onclick="submitForm()">ส่งข้อมูล</button>
+      <div class="form-section">
+        <h5>ส่วนที่ 1: ข้อมูลส่วนตัว</h5>
+        <div class="mb-3">
+          <label class="form-label required">รหัสนักศึกษา</label>
+          <input type="text" class="form-control" name="studentId" pattern="\\d{8}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ชื่อ-สกุล</label>
+          <input type="text" class="form-control" name="fullname" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">เบอร์โทรศัพท์</label>
+          <input type="tel" class="form-control" name="phone" pattern="0\\d{9}" required>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h5>ส่วนที่ 2: ข้อมูลรถ</h5>
+        <div class="mb-3">
+          <label class="form-label required">ยี่ห้อรถ</label>
+          <input type="text" class="form-control" name="vehicleBrand" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">เลขทะเบียน</label>
+          <input type="text" class="form-control" name="licensePlate" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านหน้า</label>
+          <input type="file" class="form-control" name="imageFront" accept="image/*" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านหลัง</label>
+          <input type="file" class="form-control" name="imageBack" accept="image/*" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านซ้าย</label>
+          <input type="file" class="form-control" name="imageLeft" accept="image/*" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label required">ภาพรถด้านขวา</label>
+          <input type="file" class="form-control" name="imageRight" accept="image/*" required>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="confirmCheck" required>
+          <label class="form-check-label" for="confirmCheck">
+            ขอรับรองว่าข้อมูลถูกต้องและเป็นความจริงทุกประการ...
+          </label>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="submitForm()">ส่งข้อมูล</button>
+      </div>
     </form>
   </div>
 
