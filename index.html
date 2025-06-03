@@ -42,11 +42,11 @@
         <h5>ส่วนที่ 1: ข้อมูลส่วนตัว</h5>
         <div class="mb-3">
           <label class="form-label required">รหัสนักศึกษา</label>
-          <input type="text" class="form-control" name="studentId" pattern="\d{8}" required placeholder="โปรดระบุ">
+          <input type="text" class="form-control" name="studentId" pattern="\d{8}" required>
         </div>
         <div class="mb-3">
           <label class="form-label required">ชื่อ-สกุล</label>
-          <input type="text" class="form-control" name="fullname" required placeholder="โปรดระบุ">
+          <input type="text" class="form-control" name="fullname" required>
         </div>
         <div class="mb-3">
           <label class="form-label required">สำนักวิชา</label>
@@ -75,7 +75,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">เบอร์โทรศัพท์</label>
-          <input type="tel" class="form-control" name="phone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0" placeholder="โปรดระบุ">
+          <input type="tel" class="form-control" name="phone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0">
         </div>
         <div class="mb-3">
           <label class="form-label required">ที่พักปัจจุบัน</label>
@@ -87,12 +87,12 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">ชื่อหอพัก/หมายเลขห้อง/บ้านเลขที่</label>
-          <input type="text" class="form-control" name="roomAddress" required placeholder="โปรดระบุ">
+          <input type="text" class="form-control" name="roomAddress" required>
           <small class="form-text text-muted">กรณีหอพักให้กรอกชื่อหอพักและห้อง กรณีบ้านพักให้กรอกบ้านเลขที่และที่อยู่</small>
         </div>
         <div class="mb-3">
           <label class="form-label required">ผู้ติดต่อกรณีฉุกเฉิน</label>
-          <input type="text" class="form-control" name="emergencyContact" required placeholder="โปรดระบุ">
+          <input type="text" class="form-control" name="emergencyContact" required>
         </div>
         <div class="mb-3">
           <label class="form-label required">ความสัมพันธ์กับนักศึกษา</label>
@@ -105,7 +105,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
-          <input type="tel" class="form-control" name="emergencyPhone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0" placeholder="โปรดระบุ">
+          <input type="tel" class="form-control" name="emergencyPhone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0">
         </div>
       </div>
 
@@ -121,103 +121,40 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">ยี่ห้อรถ</label>
-          <input type="text" class="form-control" name="vehicleBrand" required placeholder="โปรดระบุ">
+          <input type="text" class="form-control" name="vehicleBrand" required>
         </div>
         <div class="mb-3">
           <label class="form-label required">เลขทะเบียนรถ</label>
-          <input type="text" class="form-control" name="licensePlate" required placeholder="โปรดระบุ">
+          <input type="text" class="form-control" name="licensePlate" required>
           <small class="form-text text-muted">กรณีป้ายแดง ให้พิมพ์ว่า "ป้ายแดง" หากไม่สามารถจดทะเบียนได้ ให้พิมพ์ว่า "ไม่สามารถจดทะเบียนได้"</small>
         </div>
         <div class="mb-3">
           <label class="form-label required">จังหวัด</label>
           <select class="form-select" name="licenseProvince" required>
-  <option value="">-- โปรดเลือกจังหวัด --</option>
-  <option>ป้ายแดง</option>
-  <option>ไม่สามารถจดทะเบียนได้</option>
-  <option>กรุงเทพมหานคร</option>
-  <option>กระบี่</option>
-  <option>กาญจนบุรี</option>
-  <option>กาฬสินธุ์</option>
-  <option>กำแพงเพชร</option>
-  <option>ขอนแก่น</option>
-  <option>จันทบุรี</option>
-  <option>ฉะเชิงเทรา</option>
-  <option>ชลบุรี</option>
-  <option>ชัยนาท</option>
-  <option>ชัยภูมิ</option>
-  <option>ชุมพร</option>
-  <option>เชียงราย</option>
-  <option>เชียงใหม่</option>
-  <option>ตรัง</option>
-  <option>ตราด</option>
-  <option>ตาก</option>
-  <option>นครนายก</option>
-  <option>นครปฐม</option>
-  <option>นครพนม</option>
-  <option>นครราชสีมา</option>
-  <option>นครศรีธรรมราช</option>
-  <option>นครสวรรค์</option>
-  <option>นนทบุรี</option>
-  <option>นราธิวาส</option>
-  <option>น่าน</option>
-  <option>บึงกาฬ</option>
-  <option>บุรีรัมย์</option>
-  <option>ปทุมธานี</option>
-  <option>ประจวบคีรีขันธ์</option>
-  <option>ปราจีนบุรี</option>
-  <option>ปัตตานี</option>
-  <option>พระนครศรีอยุธยา</option>
-  <option>พะเยา</option>
-  <option>พังงา</option>
-  <option>พัทลุง</option>
-  <option>พิจิตร</option>
-  <option>พิษณุโลก</option>
-  <option>เพชรบุรี</option>
-  <option>เพชรบูรณ์</option>
-  <option>แพร่</option>
-  <option>ภูเก็ต</option>
-  <option>มหาสารคาม</option>
-  <option>มุกดาหาร</option>
-  <option>แม่ฮ่องสอน</option>
-  <option>ยะลา</option>
-  <option>ยโสธร</option>
-  <option>ร้อยเอ็ด</option>
-  <option>ระนอง</option>
-  <option>ระยอง</option>
-  <option>ราชบุรี</option>
-  <option>ลพบุรี</option>
-  <option>ลำปาง</option>
-  <option>ลำพูน</option>
-  <option>เลย</option>
-  <option>ศรีสะเกษ</option>
-  <option>สกลนคร</option>
-  <option>สงขลา</option>
-  <option>สตูล</option>
-  <option>สมุทรปราการ</option>
-  <option>สมุทรสงคราม</option>
-  <option>สมุทรสาคร</option>
-  <option>สระแก้ว</option>
-  <option>สระบุรี</option>
-  <option>สิงห์บุรี</option>
-  <option>สุโขทัย</option>
-  <option>สุพรรณบุรี</option>
-  <option>สุราษฎร์ธานี</option>
-  <option>สุรินทร์</option>
-  <option>หนองคาย</option>
-  <option>หนองบัวลำภู</option>
-  <option>อ่างทอง</option>
-  <option>อำนาจเจริญ</option>
-  <option>อุดรธานี</option>
-  <option>อุตรดิตถ์</option>
-  <option>อุทัยธานี</option>
-  <option>อุบลราชธานี</option>
-</select>
+            <option>ป้ายแดง</option>
+            <option>ไม่สามารถจดทะเบียนได้</option>
+            <option>กรุงเทพมหานคร</option>
+            <option>กระบี่</option>
+            <option>กาญจนบุรี</option>
+            <option>กาฬสินธุ์</option>
+            <option>กำแพงเพชร</option>
+            <option>ขอนแก่น</option>
+            <option>จันทบุรี</option>
+            <option>ฉะเชิงเทรา</option>
+            <option>ชลบุรี</option>
+            <option>ชัยนาท</option>
+            <option>ชัยภูมิ</option>
+            <option>ชุมพร</option>
+            <option>เชียงราย</option>
+            <option>เชียงใหม่</option>
+            <!-- สามารถเพิ่มจังหวัดอื่นๆ ได้อีกตามต้องการ -->
+          </select>
         </div>
         <div class="mb-3">
           <label class="form-label">สีรถ</label>
           <input type="text" class="form-control" name="vehicleColor">
         </div>
-        <div class="mb-3"><label class="form-label required">ภาพรถด้านหน้า</label><input type="file" class="form-control" name="imageFront" accept="image/*" required placeholder="โปรดระบุ"></div>
+        <div class="mb-3"><label class="form-label required">ภาพรถด้านหน้า</label><input type="file" class="form-control" name="imageFront" accept="image/*" required></div>
         <div class="mb-3"><label class="form-label required">ภาพรถด้านหลัง</label><input type="file" class="form-control" name="imageBack" accept="image/*" required></div>
         <div class="mb-3"><label class="form-label required">ภาพรถด้านซ้าย</label><input type="file" class="form-control" name="imageLeft" accept="image/*" required></div>
         <div class="mb-3"><label class="form-label required">ภาพรถด้านขวา</label><input type="file" class="form-control" name="imageRight" accept="image/*" required></div>
@@ -259,28 +196,6 @@ async function uploadImage(file, studentId) {
 }
 
 async function submitForm() {
-  const form = document.getElementById("registerForm");
-
-  // ตรวจสอบความถูกต้องของเบอร์โทรศัพท์
-  const phone = form.querySelector("input[name='phone']").value.trim();
-  const emergencyPhone = form.querySelector("input[name='emergencyPhone']").value.trim();
-  const phoneRegex = /^0[0-9]{9}$/;
-
-  if (!phoneRegex.test(phone)) {
-    alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง 10 หลักขึ้นต้นด้วย 0");
-    return;
-  }
-
-  if (!phoneRegex.test(emergencyPhone)) {
-    alert("กรุณากรอกเบอร์โทรศัพท์ผู้ติดต่อให้ถูกต้อง 10 หลักขึ้นต้นด้วย 0");
-    return;
-  }
-
-  const confirmBox = document.getElementById('confirmCheck');
-  if (!confirmBox.checked) {
-    alert('กรุณายอมรับข้อตกลงก่อนส่งข้อมูล');
-    return;
-  }
   const confirmBox = document.getElementById('confirmCheck');
   if (!confirmBox.checked) {
     alert('กรุณายอมรับข้อตกลงก่อนส่งข้อมูล');
