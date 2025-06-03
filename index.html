@@ -38,7 +38,7 @@
       <h3>ระบบขึ้นทะเบียนขอใช้รถ - มหาวิทยาลัยวลัยลักษณ์</h3>
     </div>
 
-    <form id="registerForm" enctype="multipart/form-data" novalidate>
+    <form id="registerForm" enctype="multipart/form-data" novalidate onsubmit="return validateForm()">
       <div class="form-section">
         <h5>ส่วนที่ 1: ข้อมูลส่วนตัว</h5>
         <div class="mb-3">
@@ -110,10 +110,21 @@
           <input type="tel" class="form-control" name="emergencyPhone" required pattern="^0\d{9}$" title="กรุณากรอกเบอร์โทรศัพท์ผู้ติดต่อให้ถูกต้อง 10 หลักขึ้นต้นด้วย 0">
         </div>
       </div>
-
-      <!-- ส่วนอื่นๆ ยังคงเหมือนเดิม -->
-
+      <div class="form-section">
+        <button type="submit" class="btn btn-primary">ส่งข้อมูล</button>
+      </div>
     </form>
   </div>
+
+  <script>
+    function validateForm() {
+      const form = document.getElementById('registerForm');
+      if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return false;
+      }
+      return true;
+    }
+  </script>
 </body>
 </html>
