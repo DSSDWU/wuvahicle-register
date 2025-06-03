@@ -75,7 +75,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">เบอร์โทรศัพท์</label>
-          <input type="tel" class="form-control" name="phone" pattern="0\d{9}" required>
+          <input type="tel" class="form-control" name="phone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0">
         </div>
         <div class="mb-3">
           <label class="form-label required">ที่พักปัจจุบัน</label>
@@ -105,7 +105,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label required">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
-          <input type="tel" class="form-control" name="emergencyPhone" pattern="0\d{9}" required>
+          <input type="tel" class="form-control" name="emergencyPhone" pattern="0[0-9]{9}" maxlength="10" required title="กรุณากรอกเบอร์โทรศัพท์ 10 หลักขึ้นต้นด้วย 0">
         </div>
       </div>
 
@@ -196,6 +196,11 @@ async function uploadImage(file, studentId) {
 }
 
 async function submitForm() {
+  const confirmBox = document.getElementById('confirmCheck');
+  if (!confirmBox.checked) {
+    alert('กรุณายอมรับข้อตกลงก่อนส่งข้อมูล');
+    return;
+  }
   const form = document.getElementById("registerForm");
   const formData = new FormData(form);
   const imageFields = ["imageFront", "imageBack", "imageLeft", "imageRight"];
