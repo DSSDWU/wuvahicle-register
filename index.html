@@ -1,131 +1,585 @@
+
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบขึ้นทะเบียนขอใช้รถ - ม.วลัยลักษณ์</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f7f7fb;
-      font-family: 'Noto Sans Thai', sans-serif;
-    }
-    .header {
-      background: linear-gradient(45deg, #d3b0ff, #ffcb9a);
-      padding: 20px;
-      color: white;
-      text-align: center;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    .form-section {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-    }
-    label.required:after {
-      content: " *";
-      color: red;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบันทึกข้อมูลการขึ้นทะเบียนขอใช้รถ มหาวิทยาลัยวลัยลักษณ์</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #a4c9f4;
+            --primary-dark: #7ba9e0;
+            --secondary-color: #ffffff;
+        }
+        body {
+            background-color: #f0f7ff;
+            font-family: 'Sarabun', sans-serif;
+        }
+        .form-container {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: var(--primary-color);
+            color: #1a365d;
+            border-radius: 10px 10px 0 0;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #1a365d;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        .section-title {
+            background-color: #e6f0ff;
+            border-left: 4px solid var(--primary-color);
+        }
+        .form-input {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(164, 201, 244, 0.3);
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1a365d;
+        }
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .required::after {
+            content: " *";
+            color: #e53e3e;
+        }
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .file-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .file-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        @media (max-width: 640px) {
+            .form-container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .header {
+                border-radius: 0;
+            }
+        }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="https://www.wu.ac.th/uploads/logoWU_1631668089.png" alt="โลโก้ ม.วลัยลักษณ์" style="height: 60px; margin-bottom: 10px;"><br>
-      <h3>ระบบขึ้นทะเบียนขอใช้รถ - มหาวิทยาลัยวลัยลักษณ์</h3>
+<body class="min-h-screen py-6 px-4 sm:px-6">
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="text-lg font-medium text-gray-700">กำลังส่งข้อมูล กรุณารอสักครู่...</p>
     </div>
 
-    <form id="registerForm"$1 onsubmit="return validateForm()" novalidate>
-      <div class="form-section">
-        <h5>ส่วนที่ 1: ข้อมูลส่วนตัว</h5>
-        <div class="mb-3">
-          <label class="form-label required">รหัสนักศึกษา</label>
-          <input type="text" class="form-control" name="studentId" required pattern="^\d{8}$" title="กรุณากรอกรหัสนักศึกษาให้ครบ 8 หลักตัวเลขเท่านั้น">
+    <div class="max-w-3xl mx-auto form-container">
+        <div class="header py-4 px-6 mb-6 text-center">
+            <h1 class="text-2xl font-bold">ระบบบันทึกข้อมูลการขึ้นทะเบียนขอใช้รถ</h1>
+            <h2 class="text-xl">มหาวิทยาลัยวลัยลักษณ์</h2>
         </div>
-        <div class="mb-3">
-          <label class="form-label required">ชื่อ-สกุล</label>
-          <input type="text" class="form-control" name="fullname" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">สำนักวิชา</label>
-          <select class="form-select" name="faculty" required>
-            <option value="">-- เลือก --</option>
-            <option>การจัดการ</option>
-            <option>การบัญชีและการเงิน</option>
-            <option>เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร</option>
-            <option>นิติศาสตร์</option>
-            <option>พยาบาลศาสตร์</option>
-            <option>แพทยศาสตร์</option>
-            <option>เภสัชศาสตร์</option>
-            <option>รัฐศาสตร์และรัฐประศาสนศาสตร์</option>
-            <option>วิทยาศาสตร์</option>
-            <option>วิศวกรรมศาสตร์และเทคโนโลยี</option>
-            <option>ศึกษาศาสตร์</option>
-            <option>ศิลปศาสตร์</option>
-            <option>สถาปัตยกรรมศาสตร์และการออกแบบ</option>
-            <option>สหเวชศาสตร์</option>
-            <option>สาธารณสุขศาสตร์</option>
-            <option>สารสนเทศศาสตร์</option>
-            <option>วิทยาลัยทันตแพทยศาสตร์นานาชาติ</option>
-            <option>วิทยาลัยนานาชาติ</option>
-            <option>วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">เบอร์โทรศัพท์</label>
-          <input type="tel" class="form-control" name="phone" required pattern="^0\d{9}$" title="กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง 10 หลักขึ้นต้นด้วย 0">
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">ที่พักปัจจุบัน</label>
-          <div>
-            <div class="form-check"><input class="form-check-input" type="radio" name="residence" value="หอพักภายในมหาวิทยาลัย" required> <label class="form-check-label">หอพักภายในมหาวิทยาลัย</label></div>
-            <div class="form-check"><input class="form-check-input" type="radio" name="residence" value="หอพักภายนอกมหาวิทยาลัย"> <label class="form-check-label">หอพักภายนอกมหาวิทยาลัย</label></div>
-            <div class="form-check"><input class="form-check-input" type="radio" name="residence" value="บ้านตนเอง"> <label class="form-check-label">บ้านตนเอง</label></div>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">ชื่อหอพัก/หมายเลขห้อง/บ้านเลขที่</label>
-          <input type="text" class="form-control" name="roomAddress" required>
-          <small class="form-text text-muted">กรณีหอพักให้กรอกชื่อหอพักและห้อง กรณีบ้านพักให้กรอกบ้านเลขที่และที่อยู่</small>
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">ผู้ติดต่อกรณีฉุกเฉิน</label>
-          <input type="text" class="form-control" name="emergencyContact" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">ความสัมพันธ์กับนักศึกษา</label>
-          <select class="form-select" name="emergencyRelation" required>
-            <option value="">-- เลือก --</option>
-            <option>บิดา/มารดา</option>
-            <option>ผู้ปกครอง</option>
-            <option>ญาติ</option>
-            <option>เพื่อน</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label required">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
-          <input type="tel" class="form-control" name="emergencyPhone" required pattern="^0\d{9}$" title="กรุณากรอกเบอร์โทรศัพท์ผู้ติดต่อให้ถูกต้อง 10 หลักขึ้นต้นด้วย 0">
-        </div>
-      </div>
-      <div class="form-section">
-        <button type="submit" class="btn btn-primary">ส่งข้อมูล</button>
-      </div>
-    </form>
-  </div>
 
-  
-<script>
-function validateForm() {
-  const form = document.getElementById('registerForm');
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return false;
-  }
-  return true;
-}
-</script>
-</body>
+        <form id="registrationForm" class="px-6 pb-8">
+            <!-- ส่วนที่ 1: ข้อมูลส่วนตัว -->
+            <div class="mb-8">
+                <h3 class="section-title text-lg font-semibold p-2 mb-4">ส่วนที่ 1: ข้อมูลส่วนตัว</h3>
+                
+                <div class="mb-4">
+                    <label for="studentId" class="form-label required">รหัสนักศึกษา</label>
+                    <input type="text" id="studentId" name="studentId" class="form-input" required maxlength="8" pattern="[0-9]{8}">
+                    <p class="error-message" id="studentId-error">กรุณากรอกรหัสนักศึกษาให้ครบ 8 หลัก และเป็นตัวเลขเท่านั้น</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="fullName" class="form-label required">ชื่อ-สกุล</label>
+                    <input type="text" id="fullName" name="fullName" class="form-input" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="faculty" class="form-label required">สำนักวิชา</label>
+                    <select id="faculty" name="faculty" class="form-input" required>
+                        <option value="" disabled selected>-- เลือกสำนักวิชา --</option>
+                        <option value="การจัดการ">การจัดการ</option>
+                        <option value="การบัญชีและการเงิน">การบัญชีและการเงิน</option>
+                        <option value="เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร">เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร</option>
+                        <option value="นิติศาสตร์">นิติศาสตร์</option>
+                        <option value="พยาบาลศาสตร์">พยาบาลศาสตร์</option>
+                        <option value="แพทยศาสตร์">แพทยศาสตร์</option>
+                        <option value="เภสัชศาสตร์">เภสัชศาสตร์</option>
+                        <option value="รัฐศาสตร์และรัฐประศาสนศาสตร์">รัฐศาสตร์และรัฐประศาสนศาสตร์</option>
+                        <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+                        <option value="วิศวกรรมศาสตร์และเทคโนโลยี">วิศวกรรมศาสตร์และเทคโนโลยี</option>
+                        <option value="ศึกษาศาสตร์">ศึกษาศาสตร์</option>
+                        <option value="ศิลปศาสตร์">ศิลปศาสตร์</option>
+                        <option value="สถาปัตยกรรมศาสตร์และการออกแบบ">สถาปัตยกรรมศาสตร์และการออกแบบ</option>
+                        <option value="สหเวชศาสตร์">สหเวชศาสตร์</option>
+                        <option value="สาธารณสุขศาสตร์">สาธารณสุขศาสตร์</option>
+                        <option value="สารสนเทศศาสตร์">สารสนเทศศาสตร์</option>
+                        <option value="วิทยาลัยทันตแพทยศาสตร์นานาชาติ">วิทยาลัยทันตแพทยศาสตร์นานาชาติ</option>
+                        <option value="วิทยาลัยนานาชาติ">วิทยาลัยนานาชาติ</option>
+                        <option value="วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี">วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="phoneNumber" class="form-label required">เบอร์โทรศัพท์</label>
+                    <input type="text" id="phoneNumber" name="phoneNumber" class="form-input" required maxlength="10" pattern="0[0-9]{9}">
+                    <p class="error-message" id="phoneNumber-error">กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก ขึ้นต้นด้วยเลข 0 และเป็นตัวเลขเท่านั้น</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label required">ที่พักปัจจุบัน</label>
+                    <div class="mt-2">
+                        <div class="flex items-center mb-2">
+                            <input type="radio" id="dormInside" name="residence" value="หอพักภายในมหาวิทยาลัย" class="mr-2" required>
+                            <label for="dormInside">หอพักภายในมหาวิทยาลัย</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" id="dormOutside" name="residence" value="หอพักภายนอกมหาวิทยาลัย" class="mr-2">
+                            <label for="dormOutside">หอพักภายนอกมหาวิทยาลัย</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="ownHouse" name="residence" value="บ้านตนเอง" class="mr-2">
+                            <label for="ownHouse">บ้านตนเอง</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="addressDetail" class="form-label required">ชื่อหอพัก/หมายเลขห้อง/บ้านเลขที่</label>
+                    <input type="text" id="addressDetail" name="addressDetail" class="form-input" required>
+                    <p class="text-sm text-gray-500 mt-1">กรณีหอพักภายในหรือภายนอก ให้กรอกชื่อหอพักและหมายเลขห้อง กรณีบ้านพักให้กรอกบ้านเลขที่และที่อยู่</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="emergencyContact" class="form-label required">ชื่อ-สกุล ผู้ติดต่อกรณีฉุกเฉิน</label>
+                    <input type="text" id="emergencyContact" name="emergencyContact" class="form-input" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label required">ความสัมพันธ์กับนักศึกษา</label>
+                    <div class="mt-2">
+                        <div class="flex items-center mb-2">
+                            <input type="radio" id="parent" name="relationship" value="บิดา/มารดา" class="mr-2" required>
+                            <label for="parent">บิดา/มารดา</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" id="guardian" name="relationship" value="ผู้ปกครอง" class="mr-2">
+                            <label for="guardian">ผู้ปกครอง</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" id="relative" name="relationship" value="ญาติ" class="mr-2">
+                            <label for="relative">ญาติ</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="friend" name="relationship" value="เพื่อน" class="mr-2">
+                            <label for="friend">เพื่อน</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="emergencyPhone" class="form-label required">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
+                    <input type="text" id="emergencyPhone" name="emergencyPhone" class="form-input" required maxlength="10" pattern="0[0-9]{9}">
+                    <p class="error-message" id="emergencyPhone-error">กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก ขึ้นต้นด้วยเลข 0 และเป็นตัวเลขเท่านั้น</p>
+                </div>
+            </div>
+
+            <!-- ส่วนที่ 2: ข้อมูลรถที่ขึ้นทะเบียน -->
+            <div class="mb-8">
+                <h3 class="section-title text-lg font-semibold p-2 mb-4">ส่วนที่ 2: ข้อมูลรถที่ขึ้นทะเบียน</h3>
+                
+                <div class="mb-4">
+                    <label for="vehicleType" class="form-label required">ประเภทรถ</label>
+                    <select id="vehicleType" name="vehicleType" class="form-input" required>
+                        <option value="" disabled selected>-- เลือกประเภทรถ --</option>
+                        <option value="รถยนต์(น้ำมัน)">รถยนต์(น้ำมัน)</option>
+                        <option value="รถยนต์ไฟฟ้า">รถยนต์ไฟฟ้า</option>
+                        <option value="รถจักรยานยนต์ไฟฟ้า">รถจักรยานยนต์ไฟฟ้า</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="brand" class="form-label required">ยี่ห้อรถ</label>
+                    <input type="text" id="brand" name="brand" class="form-input" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="licensePlate" class="form-label required">เลขทะเบียนรถ</label>
+                    <input type="text" id="licensePlate" name="licensePlate" class="form-input" required>
+                    <p class="text-sm text-gray-500 mt-1">กรณีรถป้ายแดงให้กรอกว่า "ป้ายแดง" กรณีเป็นรถที่ไม่สามารถจดทะเบียนได้ให้กรอกว่า "ไม่สามารถจดทะเบียนได้"</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="province" class="form-label required">จังหวัด</label>
+                    <select id="province" name="province" class="form-input" required>
+                        <option value="" disabled selected>-- เลือกจังหวัด --</option>
+                        <option value="ป้ายแดง">ป้ายแดง</option>
+                        <option value="ไม่สามารถจดทะเบียนได้">ไม่สามารถจดทะเบียนได้</option>
+                        <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+                        <option value="กระบี่">กระบี่</option>
+                        <option value="กาญจนบุรี">กาญจนบุรี</option>
+                        <option value="กาฬสินธุ์">กาฬสินธุ์</option>
+                        <option value="กำแพงเพชร">กำแพงเพชร</option>
+                        <option value="ขอนแก่น">ขอนแก่น</option>
+                        <option value="จันทบุรี">จันทบุรี</option>
+                        <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+                        <option value="ชลบุรี">ชลบุรี</option>
+                        <option value="ชัยนาท">ชัยนาท</option>
+                        <option value="ชัยภูมิ">ชัยภูมิ</option>
+                        <option value="ชุมพร">ชุมพร</option>
+                        <option value="เชียงราย">เชียงราย</option>
+                        <option value="เชียงใหม่">เชียงใหม่</option>
+                        <option value="ตรัง">ตรัง</option>
+                        <option value="ตราด">ตราด</option>
+                        <option value="ตาก">ตาก</option>
+                        <option value="นครนายก">นครนายก</option>
+                        <option value="นครปฐม">นครปฐม</option>
+                        <option value="นครพนม">นครพนม</option>
+                        <option value="นครราชสีมา">นครราชสีมา</option>
+                        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                        <option value="นครสวรรค์">นครสวรรค์</option>
+                        <option value="นนทบุรี">นนทบุรี</option>
+                        <option value="นราธิวาส">นราธิวาส</option>
+                        <option value="น่าน">น่าน</option>
+                        <option value="บึงกาฬ">บึงกาฬ</option>
+                        <option value="บุรีรัมย์">บุรีรัมย์</option>
+                        <option value="ปทุมธานี">ปทุมธานี</option>
+                        <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+                        <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+                        <option value="ปัตตานี">ปัตตานี</option>
+                        <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+                        <option value="พะเยา">พะเยา</option>
+                        <option value="พังงา">พังงา</option>
+                        <option value="พัทลุง">พัทลุง</option>
+                        <option value="พิจิตร">พิจิตร</option>
+                        <option value="พิษณุโลก">พิษณุโลก</option>
+                        <option value="เพชรบุรี">เพชรบุรี</option>
+                        <option value="เพชรบูรณ์">เพชรบูรณ์</option>
+                        <option value="แพร่">แพร่</option>
+                        <option value="ภูเก็ต">ภูเก็ต</option>
+                        <option value="มหาสารคาม">มหาสารคาม</option>
+                        <option value="มุกดาหาร">มุกดาหาร</option>
+                        <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+                        <option value="ยโสธร">ยโสธร</option>
+                        <option value="ยะลา">ยะลา</option>
+                        <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+                        <option value="ระนอง">ระนอง</option>
+                        <option value="ระยอง">ระยอง</option>
+                        <option value="ราชบุรี">ราชบุรี</option>
+                        <option value="ลพบุรี">ลพบุรี</option>
+                        <option value="ลำปาง">ลำปาง</option>
+                        <option value="ลำพูน">ลำพูน</option>
+                        <option value="เลย">เลย</option>
+                        <option value="ศรีสะเกษ">ศรีสะเกษ</option>
+                        <option value="สกลนคร">สกลนคร</option>
+                        <option value="สงขลา">สงขลา</option>
+                        <option value="สตูล">สตูล</option>
+                        <option value="สมุทรปราการ">สมุทรปราการ</option>
+                        <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+                        <option value="สมุทรสาคร">สมุทรสาคร</option>
+                        <option value="สระแก้ว">สระแก้ว</option>
+                        <option value="สระบุรี">สระบุรี</option>
+                        <option value="สิงห์บุรี">สิงห์บุรี</option>
+                        <option value="สุโขทัย">สุโขทัย</option>
+                        <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+                        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                        <option value="สุรินทร์">สุรินทร์</option>
+                        <option value="หนองคาย">หนองคาย</option>
+                        <option value="หนองบัวลำภู">หนองบัวลำภู</option>
+                        <option value="อ่างทอง">อ่างทอง</option>
+                        <option value="อำนาจเจริญ">อำนาจเจริญ</option>
+                        <option value="อุดรธานี">อุดรธานี</option>
+                        <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+                        <option value="อุทัยธานี">อุทัยธานี</option>
+                        <option value="อุบลราชธานี">อุบลราชธานี</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="color" class="form-label required">สีรถ</label>
+                    <input type="text" id="color" name="color" class="form-input" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="form-label required">ภาพถ่ายรถด้านหน้า</label>
+                    <div class="file-input-container w-full">
+                        <button type="button" class="btn-primary py-2 px-4 rounded w-full">เลือกไฟล์</button>
+                        <input type="file" id="frontImage" name="frontImage" class="file-input" accept="image/*" required>
+                    </div>
+                    <div class="file-preview" id="frontImagePreview">
+                        <span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="form-label required">ภาพถ่ายรถด้านหลัง</label>
+                    <div class="file-input-container w-full">
+                        <button type="button" class="btn-primary py-2 px-4 rounded w-full">เลือกไฟล์</button>
+                        <input type="file" id="backImage" name="backImage" class="file-input" accept="image/*" required>
+                    </div>
+                    <div class="file-preview" id="backImagePreview">
+                        <span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="form-label required">ภาพถ่ายรถด้านข้างฝั่งซ้าย</label>
+                    <div class="file-input-container w-full">
+                        <button type="button" class="btn-primary py-2 px-4 rounded w-full">เลือกไฟล์</button>
+                        <input type="file" id="leftImage" name="leftImage" class="file-input" accept="image/*" required>
+                    </div>
+                    <div class="file-preview" id="leftImagePreview">
+                        <span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="form-label required">ภาพถ่ายรถด้านข้างฝั่งขวา</label>
+                    <div class="file-input-container w-full">
+                        <button type="button" class="btn-primary py-2 px-4 rounded w-full">เลือกไฟล์</button>
+                        <input type="file" id="rightImage" name="rightImage" class="file-input" accept="image/*" required>
+                    </div>
+                    <div class="file-preview" id="rightImagePreview">
+                        <span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- คำรับรอง -->
+            <div class="mb-8">
+                <div class="flex items-start mb-4">
+                    <input type="checkbox" id="agreement" name="agreement" class="mt-1 mr-2" required>
+                    <label for="agreement" class="text-sm">
+                        <span class="font-medium">ขอรับรองว่าข้อมูลถูกต้องและเป็นความจริงทุกประการ</span> หากมีเจตนาให้ข้อมูลเท็จ ข้าพเจ้ายินดีรับโทษตามระเบียบและข้อบังคับของมหาวิทยาลัยทุกประการ
+                    </label>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn-primary py-3 px-8 rounded-lg font-medium text-lg">ส่งข้อมูล</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Input validation
+            const studentIdInput = document.getElementById('studentId');
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const emergencyPhoneInput = document.getElementById('emergencyPhone');
+            
+            // File preview
+            const fileInputs = ['frontImage', 'backImage', 'leftImage', 'rightImage'];
+            
+            fileInputs.forEach(id => {
+                const input = document.getElementById(id);
+                const preview = document.getElementById(id + 'Preview');
+                
+                input.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const file = this.files[0];
+                        
+                        // Check file size (max 10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'ไฟล์มีขนาดใหญ่เกินไป',
+                                text: 'กรุณาอัปโหลดไฟล์ที่มีขนาดไม่เกิน 10MB',
+                                confirmButtonColor: '#a4c9f4'
+                            });
+                            this.value = '';
+                            preview.innerHTML = '<span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>';
+                            return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        preview.innerHTML = '<span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>';
+                    }
+                });
+            });
+            
+            // Form validation
+            const form = document.getElementById('registrationForm');
+            
+            // Student ID validation
+            studentIdInput.addEventListener('input', function() {
+                const errorElement = document.getElementById('studentId-error');
+                if (this.validity.patternMismatch || this.value.length !== 8) {
+                    errorElement.style.display = 'block';
+                } else {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // Phone number validation
+            phoneNumberInput.addEventListener('input', function() {
+                const errorElement = document.getElementById('phoneNumber-error');
+                if (this.validity.patternMismatch || this.value.length !== 10 || !this.value.startsWith('0')) {
+                    errorElement.style.display = 'block';
+                } else {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // Emergency phone validation
+            emergencyPhoneInput.addEventListener('input', function() {
+                const errorElement = document.getElementById('emergencyPhone-error');
+                if (this.validity.patternMismatch || this.value.length !== 10 || !this.value.startsWith('0')) {
+                    errorElement.style.display = 'block';
+                } else {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Check if the form is valid
+                if (!form.checkValidity()) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                        text: 'โปรดตรวจสอบข้อมูลที่กรอกและลองใหม่อีกครั้ง',
+                        confirmButtonColor: '#a4c9f4'
+                    });
+                    return;
+                }
+                
+                // Check if agreement is checked
+                if (!document.getElementById('agreement').checked) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณายอมรับข้อตกลง',
+                        text: 'โปรดยอมรับข้อตกลงก่อนส่งข้อมูล',
+                        confirmButtonColor: '#a4c9f4'
+                    });
+                    return;
+                }
+                
+                // Show loading
+                document.getElementById('loading').style.display = 'flex';
+                
+                try {
+                    // Create FormData object
+                    const formData = new FormData(form);
+                    
+                    // Send data to Google Apps Script
+                    const response = await fetch('https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    // Hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ส่งข้อมูลสำเร็จ',
+                            text: 'ขอบคุณสำหรับการลงทะเบียน',
+                            confirmButtonColor: '#a4c9f4'
+                        }).then(() => {
+                            // Reset form
+                            form.reset();
+                            // Reset file previews
+                            fileInputs.forEach(id => {
+                                document.getElementById(id + 'Preview').innerHTML = '<span class="text-gray-500">ยังไม่ได้เลือกไฟล์</span>';
+                            });
+                        });
+                    } else {
+                        throw new Error(result.error || 'เกิดข้อผิดพลาดในการส่งข้อมูล');
+                    }
+                } catch (error) {
+                    // Hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message || 'เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง',
+                        confirmButtonColor: '#a4c9f4'
+                    });
+                }
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94cf759fe018894f',t:'MTc0OTQ1OTg0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
