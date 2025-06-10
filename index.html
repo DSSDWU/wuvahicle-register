@@ -400,7 +400,7 @@
                             <span class="file-name" id="frontImage-name"></span>
                         </div>
                         <img id="frontImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 10 MB</p>
+                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
                     </div>
                     
                     <div class="mb-4">
@@ -411,7 +411,7 @@
                             <span class="file-name" id="backImage-name"></span>
                         </div>
                         <img id="backImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 10 MB</p>
+                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
                     </div>
                     
                     <div class="mb-4">
@@ -422,7 +422,7 @@
                             <span class="file-name" id="leftImage-name"></span>
                         </div>
                         <img id="leftImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 10 MB</p>
+                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
                     </div>
                     
                     <div class="mb-4">
@@ -433,7 +433,7 @@
                             <span class="file-name" id="rightImage-name"></span>
                         </div>
                         <img id="rightImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 10 MB</p>
+                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
                     </div>
                 </div>
                 
@@ -526,9 +526,9 @@
                     if (this.files && this.files[0]) {
                         const file = this.files[0];
                         
-                        // Check file size (10MB limit)
-                        if (file.size > 10 * 1024 * 1024) {
-                            alert('ขนาดไฟล์เกิน 10MB กรุณาเลือกไฟล์ใหม่');
+                        // Check file size (5MB limit)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
                             this.value = '';
                             nameSpan.textContent = '';
                             preview.style.display = 'none';
@@ -552,7 +552,7 @@
             });
             
             // Form submission
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
                 // Check if form is valid
@@ -563,21 +563,51 @@
                 // Show loading overlay
                 loadingOverlay.style.display = 'flex';
                 
-                // Create FormData object
-                const formData = new FormData(form);
-                
-                // Send data to Google Apps Script
-                fetch('https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                try {
+                    // Collect form data
+                    const formData = new FormData(form);
+                    const jsonData = {};
+                    
+                    // Process text fields
+                    for (const [key, value] of formData.entries()) {
+                        if (!key.includes('Image')) {
+                            jsonData[key] = value;
+                        }
                     }
-                    return response.json();
-                })
-                .then(data => {
+                    
+                    // Process image files
+                    const imagePromises = fileInputs.map(async (id) => {
+                        const file = document.getElementById(id).files[0];
+                        if (file) {
+                            return new Promise((resolve) => {
+                                const reader = new FileReader();
+                                reader.onloadend = function() {
+                                    // Get base64 data without the prefix
+                                    const base64data = reader.result;
+                                    jsonData[id] = base64data;
+                                    jsonData[`${id}Type`] = file.type;
+                                    jsonData[`${id}Name`] = file.name;
+                                    resolve();
+                                };
+                                reader.readAsDataURL(file);
+                            });
+                        }
+                    });
+                    
+                    // Wait for all images to be processed
+                    await Promise.all(imagePromises);
+                    
+                    // Send data to Google Apps Script
+                    const response = await fetch('https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonData)
+                    });
+                    
+                    const data = await response.json();
+                    
                     // Hide loading overlay
                     loadingOverlay.style.display = 'none';
                     
@@ -600,14 +630,13 @@
                     } else {
                         alert('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถบันทึกข้อมูลได้'));
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
                     loadingOverlay.style.display = 'none';
                     alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
-                });
+                }
             });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94d784d5a7388954',t:'MTc0OTU0NDM1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94d7981a645b8954',t:'MTc0OTU0NTE0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
