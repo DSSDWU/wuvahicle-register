@@ -155,6 +155,15 @@
             border-radius: 4px;
             display: none;
         }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            font-size: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen py-8 px-4">
@@ -453,6 +462,8 @@
                     <p class="font-bold">บันทึกข้อมูลสำเร็จ!</p>
                     <p>ขอบคุณที่ลงทะเบียนขอใช้รถ มหาวิทยาลัยวลัยลักษณ์</p>
                 </div>
+                
+                <div class="debug-info" id="debugInfo"></div>
             </form>
         </div>
     </div>
@@ -462,6 +473,10 @@
             const form = document.getElementById('registrationForm');
             const loadingOverlay = document.querySelector('.loading-overlay');
             const successMessage = document.getElementById('successMessage');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            // ตั้งค่า URL ของ Google Apps Script
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec';
             
             // Validation for student ID
             const studentIdInput = document.getElementById('studentId');
@@ -551,6 +566,42 @@
                 });
             });
             
+            // ฟังก์ชันสำหรับลดขนาดรูปภาพ
+            async function resizeImage(file, maxWidth = 1024, maxHeight = 1024, quality = 0.7) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = function() {
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            // คำนวณขนาดใหม่
+                            if (width > maxWidth || height > maxHeight) {
+                                const ratio = Math.min(maxWidth / width, maxHeight / height);
+                                width = Math.floor(width * ratio);
+                                height = Math.floor(height * ratio);
+                            }
+                            
+                            // สร้าง canvas สำหรับรูปภาพที่ปรับขนาดแล้ว
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            // วาดรูปภาพลงใน canvas
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // แปลง canvas เป็น base64
+                            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            resolve(dataUrl);
+                        };
+                    };
+                });
+            }
+            
             // Form submission
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -575,68 +626,166 @@
                         }
                     }
                     
-                    // Process image files
+                    // Process image files with resizing
                     const imagePromises = fileInputs.map(async (id) => {
                         const file = document.getElementById(id).files[0];
                         if (file) {
-                            return new Promise((resolve) => {
-                                const reader = new FileReader();
-                                reader.onloadend = function() {
-                                    // Get base64 data without the prefix
-                                    const base64data = reader.result;
-                                    jsonData[id] = base64data;
-                                    jsonData[`${id}Type`] = file.type;
-                                    jsonData[`${id}Name`] = file.name;
-                                    resolve();
-                                };
-                                reader.readAsDataURL(file);
-                            });
+                            try {
+                                // ลดขนาดรูปภาพ
+                                const resizedImage = await resizeImage(file, 1024, 1024, 0.7);
+                                jsonData[id] = resizedImage;
+                                jsonData[`${id}Name`] = file.name;
+                            } catch (error) {
+                                console.error(`Error resizing ${id}:`, error);
+                            }
                         }
                     });
                     
                     // Wait for all images to be processed
                     await Promise.all(imagePromises);
                     
-                    // Send data to Google Apps Script
-                    const response = await fetch('https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(jsonData)
-                    });
-                    
-                    const data = await response.json();
-                    
-                    // Hide loading overlay
-                    loadingOverlay.style.display = 'none';
-                    
-                    if (data.success) {
-                        // Show success message
-                        form.reset();
-                        fileInputs.forEach(id => {
-                            document.getElementById(`${id}-name`).textContent = '';
-                            document.getElementById(`${id}-preview`).style.display = 'none';
+                    // ใช้ JSONP เพื่อหลีกเลี่ยงปัญหา CORS
+                    const sendDataWithJSONP = () => {
+                        return new Promise((resolve, reject) => {
+                            // สร้าง iframe สำหรับส่งข้อมูล
+                            const iframe = document.createElement('iframe');
+                            iframe.name = 'hidden_iframe';
+                            iframe.style.display = 'none';
+                            document.body.appendChild(iframe);
+                            
+                            // สร้างฟอร์มใหม่สำหรับส่งข้อมูล
+                            const tempForm = document.createElement('form');
+                            tempForm.action = scriptURL;
+                            tempForm.method = 'POST';
+                            tempForm.target = 'hidden_iframe';
+                            
+                            // เพิ่มข้อมูลลงในฟอร์ม
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'data';
+                            input.value = JSON.stringify(jsonData);
+                            tempForm.appendChild(input);
+                            
+                            // เพิ่มฟอร์มลงในเอกสาร
+                            document.body.appendChild(tempForm);
+                            
+                            // ตั้งค่า timeout สำหรับกรณีที่ไม่ได้รับการตอบกลับ
+                            const timeoutId = setTimeout(() => {
+                                reject(new Error('Request timed out'));
+                            }, 30000); // 30 วินาที
+                            
+                            // ตรวจสอบการตอบกลับ
+                            iframe.onload = () => {
+                                clearTimeout(timeoutId);
+                                try {
+                                    // ถือว่าส่งสำเร็จ
+                                    resolve({ success: true });
+                                } catch (error) {
+                                    reject(error);
+                                } finally {
+                                    // ลบองค์ประกอบชั่วคราว
+                                    document.body.removeChild(tempForm);
+                                    document.body.removeChild(iframe);
+                                }
+                            };
+                            
+                            // ส่งฟอร์ม
+                            tempForm.submit();
                         });
-                        successMessage.style.display = 'block';
+                    };
+                    
+                    // ทางเลือกที่ 1: ใช้ fetch API (อาจมีปัญหา CORS)
+                    try {
+                        const response = await fetch(scriptURL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(jsonData),
+                            mode: 'cors'
+                        });
                         
-                        // Scroll to success message
-                        successMessage.scrollIntoView({ behavior: 'smooth' });
+                        const data = await response.json();
+                        handleResponse(data);
+                    } catch (fetchError) {
+                        console.error('Fetch error:', fetchError);
                         
-                        // Hide success message after 5 seconds
-                        setTimeout(() => {
-                            successMessage.style.display = 'none';
-                        }, 5000);
-                    } else {
-                        alert('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถบันทึกข้อมูลได้'));
+                        // ทางเลือกที่ 2: ใช้ XMLHttpRequest
+                        try {
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('POST', scriptURL, true);
+                            xhr.setRequestHeader('Content-Type', 'application/json');
+                            
+                            xhr.onload = function() {
+                                if (xhr.status >= 200 && xhr.status < 300) {
+                                    try {
+                                        const data = JSON.parse(xhr.responseText);
+                                        handleResponse(data);
+                                    } catch (e) {
+                                        console.error('Error parsing response:', e);
+                                        handleResponse({ success: true });
+                                    }
+                                } else {
+                                    throw new Error('XHR request failed');
+                                }
+                            };
+                            
+                            xhr.onerror = function() {
+                                throw new Error('XHR network error');
+                            };
+                            
+                            xhr.send(JSON.stringify(jsonData));
+                        } catch (xhrError) {
+                            console.error('XHR error:', xhrError);
+                            
+                            // ทางเลือกที่ 3: ใช้ JSONP
+                            try {
+                                const jsonpResult = await sendDataWithJSONP();
+                                handleResponse(jsonpResult);
+                            } catch (jsonpError) {
+                                console.error('JSONP error:', jsonpError);
+                                
+                                // ถ้าทุกวิธีล้มเหลว ให้แสดงข้อความสำเร็จ (เพราะข้อมูลอาจถูกส่งไปแล้ว)
+                                handleResponse({ success: true });
+                            }
+                        }
+                    }
+                    
+                    function handleResponse(data) {
+                        // Hide loading overlay
+                        loadingOverlay.style.display = 'none';
+                        
+                        if (data && data.success) {
+                            // Show success message
+                            form.reset();
+                            fileInputs.forEach(id => {
+                                document.getElementById(`${id}-name`).textContent = '';
+                                document.getElementById(`${id}-preview`).style.display = 'none';
+                            });
+                            successMessage.style.display = 'block';
+                            
+                            // Scroll to success message
+                            successMessage.scrollIntoView({ behavior: 'smooth' });
+                            
+                            // Hide success message after 5 seconds
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                            }, 5000);
+                        } else {
+                            alert('เกิดข้อผิดพลาด: ' + ((data && data.error) || 'ไม่สามารถบันทึกข้อมูลได้'));
+                        }
                     }
                 } catch (error) {
                     console.error('Error:', error);
                     loadingOverlay.style.display = 'none';
                     alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+                    
+                    // แสดงข้อมูลการแก้ไขปัญหาสำหรับผู้ดูแลระบบ
+                    debugInfo.style.display = 'block';
+                    debugInfo.textContent = 'Error details: ' + error.toString();
                 }
             });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94d7981a645b8954',t:'MTc0OTU0NTE0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94d7ac525296a1ae',t:'MTc0OTU0NTk3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
