@@ -5,95 +5,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกข้อมูลการขึ้นทะเบียนขอใช้รถ มหาวิทยาลัยวลัยลักษณ์</title>
+    <title>ระบบขึ้นทะเบียนขอใช้รถ มหาวิทยาลัยวลัยลักษณ์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         
-        * {
-            font-family: 'Sarabun', sans-serif;
+        :root {
+            --primary-color: #4ade80;
+            --primary-light: #86efac;
+            --primary-dark: #22c55e;
         }
         
         body {
-            background-color: #f0f9f0;
-        }
-        
-        .form-container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-header {
-            background-color: #4caf50;
-            color: white;
-            border-radius: 12px 12px 0 0;
-        }
-        
-        .form-section {
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .form-section:last-child {
-            border-bottom: none;
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4;
         }
         
         .btn-primary {
-            background-color: #4caf50;
-            color: white;
-            transition: all 0.3s;
+            background-color: var(--primary-color);
+            transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background-color: #388e3c;
+            background-color: var(--primary-dark);
         }
         
-        .input-field {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 8px 12px;
-            width: 100%;
-        }
-        
-        .input-field:focus {
-            border-color: #4caf50;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-        }
-        
-        .error-message {
-            color: #d32f2f;
-            font-size: 0.875rem;
-            margin-top: 4px;
-            display: none;
+        .form-section {
+            border-left: 4px solid var(--primary-color);
         }
         
         .required-field::after {
             content: "*";
-            color: #d32f2f;
-            margin-left: 4px;
+            color: #ef4444;
+            margin-left: 2px;
         }
         
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            display: none;
+        .file-upload-container {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
         }
         
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #4caf50;
+        .file-upload-container:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .file-preview {
+            max-height: 150px;
+            object-fit: contain;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .success-animation {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
+            border-top: 4px solid white;
+            width: 24px;
+            height: 24px;
             animation: spin 1s linear infinite;
         }
         
@@ -101,691 +88,519 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .success-message {
-            display: none;
-            background-color: #e8f5e9;
-            border: 1px solid #4caf50;
-            color: #2e7d32;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 16px;
-        }
-        
-        .file-input-container {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            cursor: pointer;
-        }
-        
-        .file-input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        
-        .file-label {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #4caf50;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .file-label:hover {
-            background-color: #c8e6c9;
-        }
-        
-        .file-name {
-            margin-left: 8px;
-            font-size: 0.875rem;
-        }
-        
-        .preview-image {
-            max-width: 100%;
-            max-height: 200px;
-            margin-top: 8px;
-            border-radius: 4px;
-            display: none;
-        }
-        
-        .debug-info {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f5f5f5;
-            border-radius: 4px;
-            font-size: 12px;
-            display: none;
-        }
     </style>
 </head>
-<body class="min-h-screen py-8 px-4">
-    <div class="loading-overlay">
-        <div class="spinner"></div>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-md py-4">
+            <div class="container mx-auto px-4 flex justify-center items-center">
+                <img src="https://www.wu.ac.th/uploads/logoWU_1631668089.png" alt="มหาวิทยาลัยวลัยลักษณ์" class="h-16 md:h-20">
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-6 md:py-10">
+            <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">ระบบขึ้นทะเบียนขอใช้รถ</h1>
+                <p class="text-center text-gray-600 mb-8">มหาวิทยาลัยวลัยลักษณ์</p>
+                
+                <!-- Registration Form -->
+                <form id="registrationForm" class="space-y-8">
+                    <!-- Section 1: Personal Information -->
+                    <div class="form-section pl-4 py-2">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">ส่วนที่ 1: ข้อมูลส่วนตัว</h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Student ID -->
+                            <div>
+                                <label for="studentId" class="block text-sm font-medium text-gray-700 mb-1 required-field">รหัสนักศึกษา</label>
+                                <input type="text" id="studentId" name="studentId" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกรหัสนักศึกษา 8 หลัก" required>
+                                <div id="studentIdError" class="error-message hidden">รหัสนักศึกษาต้องเป็นตัวเลข 8 หลักเท่านั้น</div>
+                            </div>
+                            
+                            <!-- Full Name -->
+                            <div>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1 required-field">ชื่อ-สกุล</label>
+                                <input type="text" id="fullName" name="fullName" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกชื่อ-นามสกุล" required>
+                            </div>
+                            
+                            <!-- Faculty -->
+                            <div>
+                                <label for="faculty" class="block text-sm font-medium text-gray-700 mb-1 required-field">สำนักวิชา</label>
+                                <select id="faculty" name="faculty" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                    <option value="" disabled selected>เลือกสำนักวิชา</option>
+                                    <option value="การจัดการ">การจัดการ</option>
+                                    <option value="การบัญชีและการเงิน">การบัญชีและการเงิน</option>
+                                    <option value="เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร">เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร</option>
+                                    <option value="นิติศาสตร์">นิติศาสตร์</option>
+                                    <option value="พยาบาลศาสตร์">พยาบาลศาสตร์</option>
+                                    <option value="แพทยศาสตร์">แพทยศาสตร์</option>
+                                    <option value="เภสัชศาสตร์">เภสัชศาสตร์</option>
+                                    <option value="รัฐศาสตร์และรัฐประศาสนศาสตร์">รัฐศาสตร์และรัฐประศาสนศาสตร์</option>
+                                    <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+                                    <option value="วิศวกรรมศาสตร์และเทคโนโลยี">วิศวกรรมศาสตร์และเทคโนโลยี</option>
+                                    <option value="ศึกษาศาสตร์">ศึกษาศาสตร์</option>
+                                    <option value="ศิลปศาสตร์">ศิลปศาสตร์</option>
+                                    <option value="สถาปัตยกรรมศาสตร์และการออกแบบ">สถาปัตยกรรมศาสตร์และการออกแบบ</option>
+                                    <option value="สหเวชศาสตร์">สหเวชศาสตร์</option>
+                                    <option value="สาธารณสุขศาสตร์">สาธารณสุขศาสตร์</option>
+                                    <option value="สารสนเทศศาสตร์">สารสนเทศศาสตร์</option>
+                                    <option value="วิทยาลัยทันตแพทยศาสตร์นานาชาติ">วิทยาลัยทันตแพทยศาสตร์นานาชาติ</option>
+                                    <option value="วิทยาลัยนานาชาติ">วิทยาลัยนานาชาติ</option>
+                                    <option value="วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี">วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Phone Number -->
+                            <div>
+                                <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1 required-field">เบอร์โทรศัพท์</label>
+                                <input type="text" id="phoneNumber" name="phoneNumber" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกเบอร์โทรศัพท์ 10 หลัก" required>
+                                <div id="phoneNumberError" class="error-message hidden">เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 0 และมี 10 หลักเท่านั้น</div>
+                            </div>
+                            
+                            <!-- Current Residence -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1 required-field">ที่พักปัจจุบัน</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="radio" id="dormInside" name="residence" value="หอพักภายในมหาวิทยาลัย" class="h-4 w-4 text-green-600 focus:ring-green-500" required>
+                                        <label for="dormInside" class="ml-2 text-sm text-gray-700">หอพักภายในมหาวิทยาลัย</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="dormOutside" name="residence" value="หอพักภายนอกมหาวิทยาลัย" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                        <label for="dormOutside" class="ml-2 text-sm text-gray-700">หอพักภายนอกมหาวิทยาลัย</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="ownHouse" name="residence" value="บ้านตนเอง" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                        <label for="ownHouse" class="ml-2 text-sm text-gray-700">บ้านตนเอง</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Residence Details -->
+                            <div>
+                                <label for="residenceDetails" class="block text-sm font-medium text-gray-700 mb-1 required-field">ชื่อหอพัก/หมายเลขห้อง/บ้านเลขที่</label>
+                                <input type="text" id="residenceDetails" name="residenceDetails" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกรายละเอียดที่พัก" required>
+                                <p class="text-xs text-gray-500 mt-1">กรณีหอพักภายในหรือภายนอก ให้กรอกชื่อหอพักและหมายเลขห้อง กรณีบ้านพักให้กรอกบ้านเลขที่และที่อยู่</p>
+                            </div>
+                            
+                            <!-- Emergency Contact Name -->
+                            <div>
+                                <label for="emergencyContactName" class="block text-sm font-medium text-gray-700 mb-1 required-field">ชื่อ-สกุล ผู้ติดต่อกรณีฉุกเฉิน</label>
+                                <input type="text" id="emergencyContactName" name="emergencyContactName" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกชื่อ-นามสกุล ผู้ติดต่อกรณีฉุกเฉิน" required>
+                            </div>
+                            
+                            <!-- Relationship -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1 required-field">ความสัมพันธ์กับนักศึกษา</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="radio" id="parent" name="relationship" value="บิดา/มารดา" class="h-4 w-4 text-green-600 focus:ring-green-500" required>
+                                        <label for="parent" class="ml-2 text-sm text-gray-700">บิดา/มารดา</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="guardian" name="relationship" value="ผู้ปกครอง" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                        <label for="guardian" class="ml-2 text-sm text-gray-700">ผู้ปกครอง</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="relative" name="relationship" value="ญาติ" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                        <label for="relative" class="ml-2 text-sm text-gray-700">ญาติ</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="friend" name="relationship" value="เพื่อน" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                        <label for="friend" class="ml-2 text-sm text-gray-700">เพื่อน</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Emergency Contact Phone -->
+                            <div>
+                                <label for="emergencyContactPhone" class="block text-sm font-medium text-gray-700 mb-1 required-field">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
+                                <input type="text" id="emergencyContactPhone" name="emergencyContactPhone" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกเบอร์โทรศัพท์ 10 หลัก" required>
+                                <div id="emergencyContactPhoneError" class="error-message hidden">เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 0 และมี 10 หลักเท่านั้น</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 2: Vehicle Information -->
+                    <div class="form-section pl-4 py-2">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">ส่วนที่ 2: ข้อมูลรถที่ขึ้นทะเบียน</h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Vehicle Type -->
+                            <div>
+                                <label for="vehicleType" class="block text-sm font-medium text-gray-700 mb-1 required-field">ประเภทรถ</label>
+                                <select id="vehicleType" name="vehicleType" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                    <option value="" disabled selected>เลือกประเภทรถ</option>
+                                    <option value="รถยนต์(น้ำมัน)">รถยนต์(น้ำมัน)</option>
+                                    <option value="รถยนต์ไฟฟ้า">รถยนต์ไฟฟ้า</option>
+                                    <option value="รถจักรยานยนต์ไฟฟ้า">รถจักรยานยนต์ไฟฟ้า</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Vehicle Brand -->
+                            <div>
+                                <label for="vehicleBrand" class="block text-sm font-medium text-gray-700 mb-1 required-field">ยี่ห้อรถ</label>
+                                <input type="text" id="vehicleBrand" name="vehicleBrand" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกยี่ห้อรถ" required>
+                            </div>
+                            
+                            <!-- License Plate -->
+                            <div>
+                                <label for="licensePlate" class="block text-sm font-medium text-gray-700 mb-1 required-field">เลขทะเบียนรถ</label>
+                                <input type="text" id="licensePlate" name="licensePlate" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกเลขทะเบียนรถ" required>
+                                <p class="text-xs text-gray-500 mt-1">กรณีรถป้ายแดงให้กรอกว่า "ป้ายแดง" กรณีเป็นรถที่ไม่สามารถจดทะเบียนได้ให้กรอกว่า "ไม่สามารถจดทะเบียนได้"</p>
+                            </div>
+                            
+                            <!-- Province -->
+                            <div>
+                                <label for="province" class="block text-sm font-medium text-gray-700 mb-1 required-field">จังหวัด</label>
+                                <select id="province" name="province" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                    <option value="" disabled selected>เลือกจังหวัด</option>
+                                    <option value="ป้ายแดง">ป้ายแดง</option>
+                                    <option value="ไม่สามารถจดทะเบียนได้">ไม่สามารถจดทะเบียนได้</option>
+                                    <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กาญจนบุรี">กาญจนบุรี</option>
+                                    <option value="กาฬสินธุ์">กาฬสินธุ์</option>
+                                    <option value="กำแพงเพชร">กำแพงเพชร</option>
+                                    <option value="ขอนแก่น">ขอนแก่น</option>
+                                    <option value="จันทบุรี">จันทบุรี</option>
+                                    <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+                                    <option value="ชลบุรี">ชลบุรี</option>
+                                    <option value="ชัยนาท">ชัยนาท</option>
+                                    <option value="ชัยภูมิ">ชัยภูมิ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="เชียงราย">เชียงราย</option>
+                                    <option value="เชียงใหม่">เชียงใหม่</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="ตราด">ตราด</option>
+                                    <option value="ตาก">ตาก</option>
+                                    <option value="นครนายก">นครนายก</option>
+                                    <option value="นครปฐม">นครปฐม</option>
+                                    <option value="นครพนม">นครพนม</option>
+                                    <option value="นครราชสีมา">นครราชสีมา</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="นครสวรรค์">นครสวรรค์</option>
+                                    <option value="นนทบุรี">นนทบุรี</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="น่าน">น่าน</option>
+                                    <option value="บึงกาฬ">บึงกาฬ</option>
+                                    <option value="บุรีรัมย์">บุรีรัมย์</option>
+                                    <option value="ปทุมธานี">ปทุมธานี</option>
+                                    <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+                                    <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+                                    <option value="พะเยา">พะเยา</option>
+                                    <option value="พังงา">พังงา</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="พิจิตร">พิจิตร</option>
+                                    <option value="พิษณุโลก">พิษณุโลก</option>
+                                    <option value="เพชรบุรี">เพชรบุรี</option>
+                                    <option value="เพชรบูรณ์">เพชรบูรณ์</option>
+                                    <option value="แพร่">แพร่</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="มหาสารคาม">มหาสารคาม</option>
+                                    <option value="มุกดาหาร">มุกดาหาร</option>
+                                    <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+                                    <option value="ยโสธร">ยโสธร</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+                                    <option value="ระนอง">ระนอง</option>
+                                    <option value="ระยอง">ระยอง</option>
+                                    <option value="ราชบุรี">ราชบุรี</option>
+                                    <option value="ลพบุรี">ลพบุรี</option>
+                                    <option value="ลำปาง">ลำปาง</option>
+                                    <option value="ลำพูน">ลำพูน</option>
+                                    <option value="เลย">เลย</option>
+                                    <option value="ศรีสะเกษ">ศรีสะเกษ</option>
+                                    <option value="สกลนคร">สกลนคร</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="สมุทรปราการ">สมุทรปราการ</option>
+                                    <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+                                    <option value="สมุทรสาคร">สมุทรสาคร</option>
+                                    <option value="สระแก้ว">สระแก้ว</option>
+                                    <option value="สระบุรี">สระบุรี</option>
+                                    <option value="สิงห์บุรี">สิงห์บุรี</option>
+                                    <option value="สุโขทัย">สุโขทัย</option>
+                                    <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="สุรินทร์">สุรินทร์</option>
+                                    <option value="หนองคาย">หนองคาย</option>
+                                    <option value="หนองบัวลำภู">หนองบัวลำภู</option>
+                                    <option value="อ่างทอง">อ่างทอง</option>
+                                    <option value="อำนาจเจริญ">อำนาจเจริญ</option>
+                                    <option value="อุดรธานี">อุดรธานี</option>
+                                    <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+                                    <option value="อุทัยธานี">อุทัยธานี</option>
+                                    <option value="อุบลราชธานี">อุบลราชธานี</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Vehicle Color -->
+                            <div>
+                                <label for="vehicleColor" class="block text-sm font-medium text-gray-700 mb-1 required-field">สีรถ</label>
+                                <input type="text" id="vehicleColor" name="vehicleColor" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="กรอกสีรถ" required>
+                            </div>
+                            
+                            <!-- Vehicle Front Image -->
+                            <div>
+                                <label for="frontImage" class="block text-sm font-medium text-gray-700 mb-1 required-field">ภาพถ่ายรถด้านหน้า</label>
+                                <div class="file-upload-container rounded-md p-4 text-center">
+                                    <input type="file" id="frontImage" name="frontImage" class="hidden" accept="image/*" required>
+                                    <label for="frontImage" class="cursor-pointer flex flex-col items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="mt-2 text-sm text-gray-500">คลิกเพื่อเลือกรูปภาพ</span>
+                                        <span class="text-xs text-gray-400 mt-1">ขนาดไฟล์ไม่เกิน 10MB</span>
+                                    </label>
+                                    <div id="frontImagePreview" class="mt-3 hidden">
+                                        <img src="" alt="ภาพตัวอย่าง" class="file-preview mx-auto">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vehicle Rear Image -->
+                            <div>
+                                <label for="rearImage" class="block text-sm font-medium text-gray-700 mb-1 required-field">ภาพถ่ายรถด้านหลัง</label>
+                                <div class="file-upload-container rounded-md p-4 text-center">
+                                    <input type="file" id="rearImage" name="rearImage" class="hidden" accept="image/*" required>
+                                    <label for="rearImage" class="cursor-pointer flex flex-col items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="mt-2 text-sm text-gray-500">คลิกเพื่อเลือกรูปภาพ</span>
+                                        <span class="text-xs text-gray-400 mt-1">ขนาดไฟล์ไม่เกิน 10MB</span>
+                                    </label>
+                                    <div id="rearImagePreview" class="mt-3 hidden">
+                                        <img src="" alt="ภาพตัวอย่าง" class="file-preview mx-auto">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vehicle Left Side Image -->
+                            <div>
+                                <label for="leftImage" class="block text-sm font-medium text-gray-700 mb-1 required-field">ภาพถ่ายรถด้านข้างฝั่งซ้าย</label>
+                                <div class="file-upload-container rounded-md p-4 text-center">
+                                    <input type="file" id="leftImage" name="leftImage" class="hidden" accept="image/*" required>
+                                    <label for="leftImage" class="cursor-pointer flex flex-col items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="mt-2 text-sm text-gray-500">คลิกเพื่อเลือกรูปภาพ</span>
+                                        <span class="text-xs text-gray-400 mt-1">ขนาดไฟล์ไม่เกิน 10MB</span>
+                                    </label>
+                                    <div id="leftImagePreview" class="mt-3 hidden">
+                                        <img src="" alt="ภาพตัวอย่าง" class="file-preview mx-auto">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vehicle Right Side Image -->
+                            <div>
+                                <label for="rightImage" class="block text-sm font-medium text-gray-700 mb-1 required-field">ภาพถ่ายรถด้านขวา</label>
+                                <div class="file-upload-container rounded-md p-4 text-center">
+                                    <input type="file" id="rightImage" name="rightImage" class="hidden" accept="image/*" required>
+                                    <label for="rightImage" class="cursor-pointer flex flex-col items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="mt-2 text-sm text-gray-500">คลิกเพื่อเลือกรูปภาพ</span>
+                                        <span class="text-xs text-gray-400 mt-1">ขนาดไฟล์ไม่เกิน 10MB</span>
+                                    </label>
+                                    <div id="rightImagePreview" class="mt-3 hidden">
+                                        <img src="" alt="ภาพตัวอย่าง" class="file-preview mx-auto">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirmation Checkbox -->
+                    <div class="mt-6">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="confirmationCheckbox" name="confirmationCheckbox" type="checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" required>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="confirmationCheckbox" class="font-medium text-gray-700">ขอรับรองว่าข้อมูลถูกต้องและเป็นความจริงทุกประการ หากมีเจตนาให้ข้อมูลเท็จ ข้าพเจ้ายินดีรับโทษตามระเบียบและข้อบังคับของมหาวิทยาลัยทุกประการ</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="flex justify-center mt-8">
+                        <button type="submit" id="submitBtn" class="btn-primary px-6 py-3 rounded-md text-white font-medium text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
+                            <span>ส่งข้อมูล</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Success Message (Hidden by default) -->
+                <div id="successMessage" class="hidden success-animation bg-green-100 border-l-4 border-green-500 p-4 mt-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700">
+                                ส่งข้อมูลสำเร็จ! ขอบคุณสำหรับการลงทะเบียน
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error Message (Hidden by default) -->
+                <div id="errorMessage" class="hidden bg-red-100 border-l-4 border-red-500 p-4 mt-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700" id="errorMessageText">
+                                เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-white py-6 mt-8">
+            <div class="container mx-auto px-4">
+                <p class="text-center text-gray-600 text-sm">© มหาวิทยาลัยวลัยลักษณ์ - ระบบขึ้นทะเบียนขอใช้รถ</p>
+            </div>
+        </footer>
     </div>
     
-    <div class="max-w-3xl mx-auto">
-        <div class="form-container">
-            <div class="form-header p-6 flex flex-col items-center">
-                <img src="https://www.wu.ac.th/uploads/logoWU_1631668089.png" alt="มหาวิทยาลัยวลัยลักษณ์" class="h-20 mb-4">
-                <h1 class="text-2xl font-bold text-center">ระบบบันทึกข้อมูลการขึ้นทะเบียนขอใช้รถ</h1>
-                <h2 class="text-xl text-center">มหาวิทยาลัยวลัยลักษณ์</h2>
-            </div>
-            
-            <form id="registrationForm" class="p-6">
-                <!-- ส่วนที่ 1: ข้อมูลส่วนตัว -->
-                <div class="form-section pb-6 mb-6">
-                    <h3 class="text-xl font-bold mb-4 text-green-800">ส่วนที่ 1: ข้อมูลส่วนตัว</h3>
-                    
-                    <div class="mb-4">
-                        <label for="studentId" class="block mb-2 font-medium required-field">รหัสนักศึกษา</label>
-                        <input type="text" id="studentId" name="studentId" class="input-field" required>
-                        <p class="error-message" id="studentId-error">กรุณากรอกรหัสนักศึกษาให้ครบ 8 หลัก และเป็นตัวเลขเท่านั้น</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="fullName" class="block mb-2 font-medium required-field">ชื่อ-สกุล</label>
-                        <input type="text" id="fullName" name="fullName" class="input-field" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="faculty" class="block mb-2 font-medium required-field">สำนักวิชา</label>
-                        <select id="faculty" name="faculty" class="input-field" required>
-                            <option value="" disabled selected>-- เลือกสำนักวิชา --</option>
-                            <option value="การจัดการ">การจัดการ</option>
-                            <option value="การบัญชีและการเงิน">การบัญชีและการเงิน</option>
-                            <option value="เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร">เทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร</option>
-                            <option value="นิติศาสตร์">นิติศาสตร์</option>
-                            <option value="พยาบาลศาสตร์">พยาบาลศาสตร์</option>
-                            <option value="แพทยศาสตร์">แพทยศาสตร์</option>
-                            <option value="เภสัชศาสตร์">เภสัชศาสตร์</option>
-                            <option value="รัฐศาสตร์และรัฐประศาสนศาสตร์">รัฐศาสตร์และรัฐประศาสนศาสตร์</option>
-                            <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
-                            <option value="วิศวกรรมศาสตร์และเทคโนโลยี">วิศวกรรมศาสตร์และเทคโนโลยี</option>
-                            <option value="ศึกษาศาสตร์">ศึกษาศาสตร์</option>
-                            <option value="ศิลปศาสตร์">ศิลปศาสตร์</option>
-                            <option value="สถาปัตยกรรมศาสตร์และการออกแบบ">สถาปัตยกรรมศาสตร์และการออกแบบ</option>
-                            <option value="สหเวชศาสตร์">สหเวชศาสตร์</option>
-                            <option value="สาธารณสุขศาสตร์">สาธารณสุขศาสตร์</option>
-                            <option value="สารสนเทศศาสตร์">สารสนเทศศาสตร์</option>
-                            <option value="วิทยาลัยทันตแพทยศาสตร์นานาชาติ">วิทยาลัยทันตแพทยศาสตร์นานาชาติ</option>
-                            <option value="วิทยาลัยนานาชาติ">วิทยาลัยนานาชาติ</option>
-                            <option value="วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี">วิทยาลัยสัตวแพทยศาสตร์อัครราชกุมารี</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="phone" class="block mb-2 font-medium required-field">เบอร์โทรศัพท์</label>
-                        <input type="text" id="phone" name="phone" class="input-field" required>
-                        <p class="error-message" id="phone-error">กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium required-field">ที่พักปัจจุบัน</label>
-                        <div class="flex flex-col space-y-2">
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="residence" value="หอพักภายในมหาวิทยาลัย" class="mr-2" required>
-                                <span>หอพักภายในมหาวิทยาลัย</span>
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="residence" value="หอพักภายนอกมหาวิทยาลัย" class="mr-2">
-                                <span>หอพักภายนอกมหาวิทยาลัย</span>
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="residence" value="บ้านตนเอง" class="mr-2">
-                                <span>บ้านตนเอง</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="address" class="block mb-2 font-medium required-field">ชื่อหอพัก/หมายเลขห้อง/บ้านเลขที่</label>
-                        <input type="text" id="address" name="address" class="input-field" required>
-                        <p class="text-sm text-gray-600 mt-1">กรณีหอพักภายในหรือภายนอก ให้กรอกชื่อหอพักและหมายเลขห้อง กรณีบ้านพักให้กรอกบ้านเลขที่และที่อยู่</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="emergencyContact" class="block mb-2 font-medium required-field">ชื่อ-สกุล ผู้ติดต่อกรณีฉุกเฉิน</label>
-                        <input type="text" id="emergencyContact" name="emergencyContact" class="input-field" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium required-field">ความสัมพันธ์กับนักศึกษา</label>
-                        <div class="flex flex-col space-y-2">
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="relationship" value="บิดา/มารดา" class="mr-2" required>
-                                <span>บิดา/มารดา</span>
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="relationship" value="ผู้ปกครอง" class="mr-2">
-                                <span>ผู้ปกครอง</span>
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="relationship" value="ญาติ" class="mr-2">
-                                <span>ญาติ</span>
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="relationship" value="เพื่อน" class="mr-2">
-                                <span>เพื่อน</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="emergencyPhone" class="block mb-2 font-medium required-field">เบอร์โทรศัพท์ผู้ติดต่อกรณีฉุกเฉิน</label>
-                        <input type="text" id="emergencyPhone" name="emergencyPhone" class="input-field" required>
-                        <p class="error-message" id="emergencyPhone-error">กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)</p>
-                    </div>
-                </div>
-                
-                <!-- ส่วนที่ 2: ข้อมูลรถที่ขึ้นทะเบียน -->
-                <div class="form-section pb-6 mb-6">
-                    <h3 class="text-xl font-bold mb-4 text-green-800">ส่วนที่ 2: ข้อมูลรถที่ขึ้นทะเบียน</h3>
-                    
-                    <div class="mb-4">
-                        <label for="vehicleType" class="block mb-2 font-medium required-field">ประเภทรถ</label>
-                        <select id="vehicleType" name="vehicleType" class="input-field" required>
-                            <option value="" disabled selected>-- เลือกประเภทรถ --</option>
-                            <option value="รถยนต์(น้ำมัน)">รถยนต์(น้ำมัน)</option>
-                            <option value="รถยนต์ไฟฟ้า">รถยนต์ไฟฟ้า</option>
-                            <option value="รถจักรยานยนต์ไฟฟ้า">รถจักรยานยนต์ไฟฟ้า</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="brand" class="block mb-2 font-medium required-field">ยี่ห้อรถ</label>
-                        <input type="text" id="brand" name="brand" class="input-field" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="licensePlate" class="block mb-2 font-medium required-field">เลขทะเบียนรถ</label>
-                        <input type="text" id="licensePlate" name="licensePlate" class="input-field" required>
-                        <p class="text-sm text-gray-600 mt-1">กรณีรถป้ายแดงให้กรอกว่า "ป้ายแดง" กรณีเป็นรถที่ไม่สามารถจดทะเบียนได้ให้กรอกว่า "ไม่สามารถจดทะเบียนได้"</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="province" class="block mb-2 font-medium required-field">จังหวัด</label>
-                        <select id="province" name="province" class="input-field" required>
-                            <option value="" disabled selected>-- เลือกจังหวัด --</option>
-                            <option value="ป้ายแดง">ป้ายแดง</option>
-                            <option value="ไม่สามารถจดทะเบียนได้">ไม่สามารถจดทะเบียนได้</option>
-                            <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
-                            <option value="กระบี่">กระบี่</option>
-                            <option value="กาญจนบุรี">กาญจนบุรี</option>
-                            <option value="กาฬสินธุ์">กาฬสินธุ์</option>
-                            <option value="กำแพงเพชร">กำแพงเพชร</option>
-                            <option value="ขอนแก่น">ขอนแก่น</option>
-                            <option value="จันทบุรี">จันทบุรี</option>
-                            <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
-                            <option value="ชลบุรี">ชลบุรี</option>
-                            <option value="ชัยนาท">ชัยนาท</option>
-                            <option value="ชัยภูมิ">ชัยภูมิ</option>
-                            <option value="ชุมพร">ชุมพร</option>
-                            <option value="เชียงราย">เชียงราย</option>
-                            <option value="เชียงใหม่">เชียงใหม่</option>
-                            <option value="ตรัง">ตรัง</option>
-                            <option value="ตราด">ตราด</option>
-                            <option value="ตาก">ตาก</option>
-                            <option value="นครนายก">นครนายก</option>
-                            <option value="นครปฐม">นครปฐม</option>
-                            <option value="นครพนม">นครพนม</option>
-                            <option value="นครราชสีมา">นครราชสีมา</option>
-                            <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
-                            <option value="นครสวรรค์">นครสวรรค์</option>
-                            <option value="นนทบุรี">นนทบุรี</option>
-                            <option value="นราธิวาส">นราธิวาส</option>
-                            <option value="น่าน">น่าน</option>
-                            <option value="บึงกาฬ">บึงกาฬ</option>
-                            <option value="บุรีรัมย์">บุรีรัมย์</option>
-                            <option value="ปทุมธานี">ปทุมธานี</option>
-                            <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
-                            <option value="ปราจีนบุรี">ปราจีนบุรี</option>
-                            <option value="ปัตตานี">ปัตตานี</option>
-                            <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
-                            <option value="พะเยา">พะเยา</option>
-                            <option value="พังงา">พังงา</option>
-                            <option value="พัทลุง">พัทลุง</option>
-                            <option value="พิจิตร">พิจิตร</option>
-                            <option value="พิษณุโลก">พิษณุโลก</option>
-                            <option value="เพชรบุรี">เพชรบุรี</option>
-                            <option value="เพชรบูรณ์">เพชรบูรณ์</option>
-                            <option value="แพร่">แพร่</option>
-                            <option value="ภูเก็ต">ภูเก็ต</option>
-                            <option value="มหาสารคาม">มหาสารคาม</option>
-                            <option value="มุกดาหาร">มุกดาหาร</option>
-                            <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
-                            <option value="ยโสธร">ยโสธร</option>
-                            <option value="ยะลา">ยะลา</option>
-                            <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
-                            <option value="ระนอง">ระนอง</option>
-                            <option value="ระยอง">ระยอง</option>
-                            <option value="ราชบุรี">ราชบุรี</option>
-                            <option value="ลพบุรี">ลพบุรี</option>
-                            <option value="ลำปาง">ลำปาง</option>
-                            <option value="ลำพูน">ลำพูน</option>
-                            <option value="เลย">เลย</option>
-                            <option value="ศรีสะเกษ">ศรีสะเกษ</option>
-                            <option value="สกลนคร">สกลนคร</option>
-                            <option value="สงขลา">สงขลา</option>
-                            <option value="สตูล">สตูล</option>
-                            <option value="สมุทรปราการ">สมุทรปราการ</option>
-                            <option value="สมุทรสงคราม">สมุทรสงคราม</option>
-                            <option value="สมุทรสาคร">สมุทรสาคร</option>
-                            <option value="สระแก้ว">สระแก้ว</option>
-                            <option value="สระบุรี">สระบุรี</option>
-                            <option value="สิงห์บุรี">สิงห์บุรี</option>
-                            <option value="สุโขทัย">สุโขทัย</option>
-                            <option value="สุพรรณบุรี">สุพรรณบุรี</option>
-                            <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-                            <option value="สุรินทร์">สุรินทร์</option>
-                            <option value="หนองคาย">หนองคาย</option>
-                            <option value="หนองบัวลำภู">หนองบัวลำภู</option>
-                            <option value="อ่างทอง">อ่างทอง</option>
-                            <option value="อำนาจเจริญ">อำนาจเจริญ</option>
-                            <option value="อุดรธานี">อุดรธานี</option>
-                            <option value="อุตรดิตถ์">อุตรดิตถ์</option>
-                            <option value="อุทัยธานี">อุทัยธานี</option>
-                            <option value="อุบลราชธานี">อุบลราชธานี</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="color" class="block mb-2 font-medium required-field">สีรถ</label>
-                        <input type="text" id="color" name="color" class="input-field" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium required-field">ภาพถ่ายรถด้านหน้า</label>
-                        <div class="file-input-container">
-                            <input type="file" id="frontImage" name="frontImage" class="file-input" accept="image/*" required>
-                            <label for="frontImage" class="file-label">เลือกไฟล์</label>
-                            <span class="file-name" id="frontImage-name"></span>
-                        </div>
-                        <img id="frontImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium required-field">ภาพถ่ายรถด้านหลัง</label>
-                        <div class="file-input-container">
-                            <input type="file" id="backImage" name="backImage" class="file-input" accept="image/*" required>
-                            <label for="backImage" class="file-label">เลือกไฟล์</label>
-                            <span class="file-name" id="backImage-name"></span>
-                        </div>
-                        <img id="backImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium required-field">ภาพถ่ายรถด้านข้างฝั่งซ้าย</label>
-                        <div class="file-input-container">
-                            <input type="file" id="leftImage" name="leftImage" class="file-input" accept="image/*" required>
-                            <label for="leftImage" class="file-label">เลือกไฟล์</label>
-                            <span class="file-name" id="leftImage-name"></span>
-                        </div>
-                        <img id="leftImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium required-field">ภาพถ่ายรถด้านข้างฝั่งขวา</label>
-                        <div class="file-input-container">
-                            <input type="file" id="rightImage" name="rightImage" class="file-input" accept="image/*" required>
-                            <label for="rightImage" class="file-label">เลือกไฟล์</label>
-                            <span class="file-name" id="rightImage-name"></span>
-                        </div>
-                        <img id="rightImage-preview" class="preview-image" alt="ภาพตัวอย่าง">
-                        <p class="text-sm text-gray-600 mt-1">ขนาดไฟล์ไม่เกิน 5 MB</p>
-                    </div>
-                </div>
-                
-                <!-- การรับรองข้อมูล -->
-                <div class="mb-6">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" id="certify" name="certify" class="mr-2" required>
-                        <span class="text-sm">ขอรับรองว่าข้อมูลถูกต้องและเป็นความจริงทุกประการ หากมีเจตนาให้ข้อมูลเท็จ ข้าพเจ้ายินดีรับโทษตามระเบียบและข้อบังคับของมหาวิทยาลัยทุกประการ</span>
-                    </label>
-                </div>
-                
-                <div class="text-center">
-                    <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-medium text-lg">บันทึกข้อมูล</button>
-                </div>
-                
-                <div class="success-message" id="successMessage">
-                    <p class="font-bold">บันทึกข้อมูลสำเร็จ!</p>
-                    <p>ขอบคุณที่ลงทะเบียนขอใช้รถ มหาวิทยาลัยวลัยลักษณ์</p>
-                </div>
-                
-                <div class="debug-info" id="debugInfo"></div>
-            </form>
-        </div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
             const form = document.getElementById('registrationForm');
-            const loadingOverlay = document.querySelector('.loading-overlay');
-            const successMessage = document.getElementById('successMessage');
-            const debugInfo = document.getElementById('debugInfo');
-            
-            // ตั้งค่า URL ของ Google Apps Script
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec';
-            
-            // Validation for student ID
             const studentIdInput = document.getElementById('studentId');
-            const studentIdError = document.getElementById('studentId-error');
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const emergencyContactPhoneInput = document.getElementById('emergencyContactPhone');
+            const submitBtn = document.getElementById('submitBtn');
+            const confirmationCheckbox = document.getElementById('confirmationCheckbox');
             
-            studentIdInput.addEventListener('input', function() {
-                const value = this.value;
-                const isValid = /^\d{8}$/.test(value);
-                
-                if (!isValid) {
-                    studentIdError.style.display = 'block';
-                    this.setCustomValidity('กรุณากรอกรหัสนักศึกษาให้ครบ 8 หลัก และเป็นตัวเลขเท่านั้น');
-                } else {
-                    studentIdError.style.display = 'none';
-                    this.setCustomValidity('');
-                }
-            });
+            // Image preview functionality
+            const imageInputs = ['frontImage', 'rearImage', 'leftImage', 'rightImage'];
             
-            // Validation for phone numbers
-            const phoneInput = document.getElementById('phone');
-            const phoneError = document.getElementById('phone-error');
-            
-            phoneInput.addEventListener('input', function() {
-                const value = this.value;
-                const isValid = /^0\d{9}$/.test(value);
-                
-                if (!isValid) {
-                    phoneError.style.display = 'block';
-                    this.setCustomValidity('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)');
-                } else {
-                    phoneError.style.display = 'none';
-                    this.setCustomValidity('');
-                }
-            });
-            
-            // Validation for emergency phone
-            const emergencyPhoneInput = document.getElementById('emergencyPhone');
-            const emergencyPhoneError = document.getElementById('emergencyPhone-error');
-            
-            emergencyPhoneInput.addEventListener('input', function() {
-                const value = this.value;
-                const isValid = /^0\d{9}$/.test(value);
-                
-                if (!isValid) {
-                    emergencyPhoneError.style.display = 'block';
-                    this.setCustomValidity('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)');
-                } else {
-                    emergencyPhoneError.style.display = 'none';
-                    this.setCustomValidity('');
-                }
-            });
-            
-            // File input handling
-            const fileInputs = ['frontImage', 'backImage', 'leftImage', 'rightImage'];
-            
-            fileInputs.forEach(id => {
-                const input = document.getElementById(id);
-                const nameSpan = document.getElementById(`${id}-name`);
-                const preview = document.getElementById(`${id}-preview`);
+            imageInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                const preview = document.getElementById(`${inputId}Preview`);
                 
                 input.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        const file = this.files[0];
+                    if (input.files && input.files[0]) {
+                        const file = input.files[0];
                         
-                        // Check file size (5MB limit)
-                        if (file.size > 5 * 1024 * 1024) {
-                            alert('ขนาดไฟล์เกิน 5MB กรุณาเลือกไฟล์ใหม่');
-                            this.value = '';
-                            nameSpan.textContent = '';
-                            preview.style.display = 'none';
+                        // Check file size (max 10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert('ขนาดไฟล์ต้องไม่เกิน 10MB');
+                            input.value = '';
                             return;
                         }
                         
-                        nameSpan.textContent = file.name;
-                        
-                        // Show image preview
                         const reader = new FileReader();
+                        
                         reader.onload = function(e) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
+                            const img = preview.querySelector('img');
+                            img.src = e.target.result;
+                            preview.classList.remove('hidden');
                         };
+                        
                         reader.readAsDataURL(file);
-                    } else {
-                        nameSpan.textContent = '';
-                        preview.style.display = 'none';
                     }
                 });
             });
             
-            // ฟังก์ชันสำหรับลดขนาดรูปภาพ
-            async function resizeImage(file, maxWidth = 1024, maxHeight = 1024, quality = 0.7) {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = function(e) {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.onload = function() {
-                            let width = img.width;
-                            let height = img.height;
-                            
-                            // คำนวณขนาดใหม่
-                            if (width > maxWidth || height > maxHeight) {
-                                const ratio = Math.min(maxWidth / width, maxHeight / height);
-                                width = Math.floor(width * ratio);
-                                height = Math.floor(height * ratio);
-                            }
-                            
-                            // สร้าง canvas สำหรับรูปภาพที่ปรับขนาดแล้ว
-                            const canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
-                            
-                            // วาดรูปภาพลงใน canvas
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            // แปลง canvas เป็น base64
-                            const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                            resolve(dataUrl);
-                        };
-                    };
-                });
+            // Validation functions
+            function validateStudentId() {
+                const value = studentIdInput.value;
+                const isValid = /^\d{8}$/.test(value);
+                document.getElementById('studentIdError').classList.toggle('hidden', isValid);
+                return isValid;
             }
             
+            function validatePhoneNumber(input, errorElement) {
+                const value = input.value;
+                const isValid = /^0\d{9}$/.test(value);
+                document.getElementById(errorElement).classList.toggle('hidden', isValid);
+                return isValid;
+            }
+            
+            // Input validation events
+            studentIdInput.addEventListener('input', validateStudentId);
+            phoneNumberInput.addEventListener('input', function() {
+                validatePhoneNumber(phoneNumberInput, 'phoneNumberError');
+            });
+            emergencyContactPhoneInput.addEventListener('input', function() {
+                validatePhoneNumber(emergencyContactPhoneInput, 'emergencyContactPhoneError');
+            });
+            
             // Form submission
-            form.addEventListener('submit', async function(e) {
+            form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                // Check if form is valid
-                if (!form.checkValidity()) {
+                // Validate all fields
+                const isStudentIdValid = validateStudentId();
+                const isPhoneValid = validatePhoneNumber(phoneNumberInput, 'phoneNumberError');
+                const isEmergencyPhoneValid = validatePhoneNumber(emergencyContactPhoneInput, 'emergencyContactPhoneError');
+                
+                if (!isStudentIdValid || !isPhoneValid || !isEmergencyPhoneValid || !confirmationCheckbox.checked) {
                     return;
                 }
                 
-                // Show loading overlay
-                loadingOverlay.style.display = 'flex';
+                // Show loading state
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <div class="loading-spinner mr-2"></div>
+                    <span>กำลังส่งข้อมูล...</span>
+                `;
                 
-                try {
-                    // Collect form data
-                    const formData = new FormData(form);
-                    const jsonData = {};
+                // Create FormData object
+                const formData = new FormData(form);
+                
+                // Send data to Google Apps Script
+                fetch('https://script.google.com/macros/s/AKfycbwXIQuYT-gQonLD-ksxYXNv-B7aDz9Yq8cufoYdWo_Ft8FMUolNgwMe6z6cczyO7FMD/exec', {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'no-cors'
+                })
+                .then(response => {
+                    // Show success message
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    form.reset();
                     
-                    // Process text fields
-                    for (const [key, value] of formData.entries()) {
-                        if (!key.includes('Image')) {
-                            jsonData[key] = value;
-                        }
-                    }
-                    
-                    // Process image files with resizing
-                    const imagePromises = fileInputs.map(async (id) => {
-                        const file = document.getElementById(id).files[0];
-                        if (file) {
-                            try {
-                                // ลดขนาดรูปภาพ
-                                const resizedImage = await resizeImage(file, 1024, 1024, 0.7);
-                                jsonData[id] = resizedImage;
-                                jsonData[`${id}Name`] = file.name;
-                            } catch (error) {
-                                console.error(`Error resizing ${id}:`, error);
-                            }
-                        }
+                    // Reset image previews
+                    imageInputs.forEach(inputId => {
+                        document.getElementById(`${inputId}Preview`).classList.add('hidden');
                     });
                     
-                    // Wait for all images to be processed
-                    await Promise.all(imagePromises);
-                    
-                    // ใช้ JSONP เพื่อหลีกเลี่ยงปัญหา CORS
-                    const sendDataWithJSONP = () => {
-                        return new Promise((resolve, reject) => {
-                            // สร้าง iframe สำหรับส่งข้อมูล
-                            const iframe = document.createElement('iframe');
-                            iframe.name = 'hidden_iframe';
-                            iframe.style.display = 'none';
-                            document.body.appendChild(iframe);
-                            
-                            // สร้างฟอร์มใหม่สำหรับส่งข้อมูล
-                            const tempForm = document.createElement('form');
-                            tempForm.action = scriptURL;
-                            tempForm.method = 'POST';
-                            tempForm.target = 'hidden_iframe';
-                            
-                            // เพิ่มข้อมูลลงในฟอร์ม
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = 'data';
-                            input.value = JSON.stringify(jsonData);
-                            tempForm.appendChild(input);
-                            
-                            // เพิ่มฟอร์มลงในเอกสาร
-                            document.body.appendChild(tempForm);
-                            
-                            // ตั้งค่า timeout สำหรับกรณีที่ไม่ได้รับการตอบกลับ
-                            const timeoutId = setTimeout(() => {
-                                reject(new Error('Request timed out'));
-                            }, 30000); // 30 วินาที
-                            
-                            // ตรวจสอบการตอบกลับ
-                            iframe.onload = () => {
-                                clearTimeout(timeoutId);
-                                try {
-                                    // ถือว่าส่งสำเร็จ
-                                    resolve({ success: true });
-                                } catch (error) {
-                                    reject(error);
-                                } finally {
-                                    // ลบองค์ประกอบชั่วคราว
-                                    document.body.removeChild(tempForm);
-                                    document.body.removeChild(iframe);
-                                }
-                            };
-                            
-                            // ส่งฟอร์ม
-                            tempForm.submit();
-                        });
-                    };
-                    
-                    // ทางเลือกที่ 1: ใช้ fetch API (อาจมีปัญหา CORS)
-                    try {
-                        const response = await fetch(scriptURL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(jsonData),
-                            mode: 'cors'
-                        });
-                        
-                        const data = await response.json();
-                        handleResponse(data);
-                    } catch (fetchError) {
-                        console.error('Fetch error:', fetchError);
-                        
-                        // ทางเลือกที่ 2: ใช้ XMLHttpRequest
-                        try {
-                            const xhr = new XMLHttpRequest();
-                            xhr.open('POST', scriptURL, true);
-                            xhr.setRequestHeader('Content-Type', 'application/json');
-                            
-                            xhr.onload = function() {
-                                if (xhr.status >= 200 && xhr.status < 300) {
-                                    try {
-                                        const data = JSON.parse(xhr.responseText);
-                                        handleResponse(data);
-                                    } catch (e) {
-                                        console.error('Error parsing response:', e);
-                                        handleResponse({ success: true });
-                                    }
-                                } else {
-                                    throw new Error('XHR request failed');
-                                }
-                            };
-                            
-                            xhr.onerror = function() {
-                                throw new Error('XHR network error');
-                            };
-                            
-                            xhr.send(JSON.stringify(jsonData));
-                        } catch (xhrError) {
-                            console.error('XHR error:', xhrError);
-                            
-                            // ทางเลือกที่ 3: ใช้ JSONP
-                            try {
-                                const jsonpResult = await sendDataWithJSONP();
-                                handleResponse(jsonpResult);
-                            } catch (jsonpError) {
-                                console.error('JSONP error:', jsonpError);
-                                
-                                // ถ้าทุกวิธีล้มเหลว ให้แสดงข้อความสำเร็จ (เพราะข้อมูลอาจถูกส่งไปแล้ว)
-                                handleResponse({ success: true });
-                            }
-                        }
-                    }
-                    
-                    function handleResponse(data) {
-                        // Hide loading overlay
-                        loadingOverlay.style.display = 'none';
-                        
-                        if (data && data.success) {
-                            // Show success message
-                            form.reset();
-                            fileInputs.forEach(id => {
-                                document.getElementById(`${id}-name`).textContent = '';
-                                document.getElementById(`${id}-preview`).style.display = 'none';
-                            });
-                            successMessage.style.display = 'block';
-                            
-                            // Scroll to success message
-                            successMessage.scrollIntoView({ behavior: 'smooth' });
-                            
-                            // Hide success message after 5 seconds
-                            setTimeout(() => {
-                                successMessage.style.display = 'none';
-                            }, 5000);
-                        } else {
-                            alert('เกิดข้อผิดพลาด: ' + ((data && data.error) || 'ไม่สามารถบันทึกข้อมูลได้'));
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    loadingOverlay.style.display = 'none';
-                    alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
-                    
-                    // แสดงข้อมูลการแก้ไขปัญหาสำหรับผู้ดูแลระบบ
-                    debugInfo.style.display = 'block';
-                    debugInfo.textContent = 'Error details: ' + error.toString();
-                }
+                    // Scroll to success message
+                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    // Show error message
+                    document.getElementById('errorMessageText').textContent = 'เกิดข้อผิดพลาด: ' + error.message;
+                    document.getElementById('errorMessage').classList.remove('hidden');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                });
             });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94d7ac525296a1ae',t:'MTc0OTU0NTk3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94d7d21e33fb8940',t:'MTc0OTU0NzUyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
