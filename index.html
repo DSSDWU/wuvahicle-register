@@ -50,7 +50,7 @@
         }
 
         .header img {
-            max-width: 120px; /* Further adjusted logo size */
+            max-width: 180px; /* Adjusted logo size */
             height: auto;
             margin-bottom: 10px;
         }
@@ -300,16 +300,19 @@
                     <label for="phone" class="required">เบอร์โทรศัพท์</label>
                     <input type="tel" id="phone" name="phone" required pattern="0\d{9}" title="กรุณากรอกเบอร์โทรศัพท์ 10 หลัก และขึ้นต้นด้วย 0" placeholder="เช่น 0812345678">
                 </div>
-                <!-- Changed to Dropdown -->
                 <div class="form-group">
-                    <label for="residence" class="required">ที่พักปัจจุบัน</label>
-                    <div class="select-container">
-                        <select id="residence" name="residence" required>
-                            <option value="" disabled selected>-- กรุณาเลือกที่พัก --</option>
-                            <option value="หอพักภายในมหาวิทยาลัย">หอพักภายในมหาวิทยาลัย</option>
-                            <option value="หอพักภายนอกมหาวิทยาลัย">หอพักภายนอกมหาวิทยาลัย</option>
-                            <option value="บ้านตนเอง">บ้านตนเอง</option>
-                        </select>
+                    <label class="required">ที่พักปัจจุบัน</label>
+                    <div class="radio-group">
+                        <input type="radio" id="dorm-in" name="residence" value="หอพักภายในมหาวิทยาลัย" required>
+                        <label for="dorm-in">หอพักภายในมหาวิทยาลัย</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="dorm-out" name="residence" value="หอพักภายนอกมหาวิทยาลัย">
+                        <label for="dorm-out">หอพักภายนอกมหาวิทยาลัย</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="home" name="residence" value="บ้านตนเอง">
+                        <label for="home">บ้านตนเอง</label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -321,17 +324,24 @@
                     <label for="emergencyContactName" class="required">ชื่อ-สกุล ผู้ติดต่อกรณีฉุกเฉิน</label>
                     <input type="text" id="emergencyContactName" name="emergencyContactName" required placeholder="ชื่อ-สกุลผู้ติดต่อ">
                 </div>
-                <!-- Changed to Dropdown -->
+                <!-- Added missing field: Emergency Contact Relation -->
                 <div class="form-group">
-                    <label for="emergencyRelation" class="required">ความสัมพันธ์กับนักศึกษา</label>
-                    <div class="select-container">
-                         <select id="emergencyRelation" name="emergencyRelation" required>
-                            <option value="" disabled selected>-- กรุณาเลือกความสัมพันธ์ --</option>
-                            <option value="บิดา/มารดา">บิดา/มารดา</option>
-                            <option value="ผู้ปกครอง">ผู้ปกครอง</option>
-                            <option value="ญาติ">ญาติ</option>
-                            <option value="เพื่อน">เพื่อน</option>
-                        </select>
+                    <label class="required">ความสัมพันธ์กับนักศึกษา</label>
+                    <div class="radio-group">
+                        <input type="radio" id="rel-parent" name="emergencyRelation" value="บิดา/มารดา" required>
+                        <label for="rel-parent">บิดา/มารดา</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="rel-guardian" name="emergencyRelation" value="ผู้ปกครอง">
+                        <label for="rel-guardian">ผู้ปกครอง</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="rel-relative" name="emergencyRelation" value="ญาติ">
+                        <label for="rel-relative">ญาติ</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="rel-friend" name="emergencyRelation" value="เพื่อน">
+                        <label for="rel-friend">เพื่อน</label>
                     </div>
                 </div>
                  <div class="form-group">
@@ -352,6 +362,7 @@
                         </select>
                     </div>
                 </div>
+                <!-- Added missing field: Vehicle Brand -->
                 <div class="form-group">
                     <label for="brand" class="required">ยี่ห้อรถ</label>
                     <input type="text" id="brand" name="brand" required placeholder="เช่น Toyota, Honda, Yamaha">
